@@ -28,7 +28,8 @@ module register_file_tb;
   // interface
   register_file_if rfif ();
   // test program
-  test PROG ();
+  test PROG (.CLK(CLK),.nRST(nRST),.rfif(rfif));
+
   // DUT
 `ifndef MAPPED
   register_file DUT(CLK, nRST, rfif);
@@ -46,7 +47,50 @@ module register_file_tb;
   );
 `endif
 
+
 endmodule
 
-program test;
+program test(input logic CLK,nRST,
+register_file_if rfif);
+initial begin
+
+integer i;
+rfif.WEN ='0;    
+rfif.wsel = '0;
+rfif.wdat = '0;
+rfif.rsel1 = '0;
+rfif.rsel2 = '0;
+register_file_tb.nRST = 0;
+@(negedge CLK);
+@(negedge CLK);
+@(negedge CLK);
+register_file_tb.nRST = 1;
+@(negedge CLK);
+//test write to reg 0
+//verify writes and reads
+rfif.WEN = 1;    
+
+for (i = 0;i <32;i++) begin
+  rfif.wsel = i; 
+  rfif.wdat = i*4; 
+  @(negedge CLK);
+  @(negedge CLK);
+end
+
+for (i = 0;i <16;i++) begin
+  rfif.rsel1 = i; 
+  rfif.rsel2= i+16; 
+  @(negedge CLK);
+  @(negedge CLK);
+end
+
+//test async reset
+register_file_tb.nRST = 0;
+@(negedge CLK);
+@(negedge CLK);
+@(negedge CLK);
+register_file_tb.nRST = 1;
+
+end
 endprogram
+
