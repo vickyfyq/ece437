@@ -14,27 +14,31 @@ sw $6, 4($29)
 sw $7, 0($29)
 #if only two left on stack (last int and result) exit the program
 mult_procedure:
-ori $8, $0, 0xfff8
-beq $29, $8, exit
+ori $28, $0, 0xfff8
+beq $29, $28, exit
 
 mult:
-#load first two on top of stack
-lw $7, 0($29)
-lw $6, 4($29)
+#pop two int
+lw $7, 0($29)  #X, B
+lw $6, 4($29)  #Y, Q
 addi $29, $29, 8
-#initialize result reg
-ori $9, $0, 0
-
+#initialize result
+ori $8, $0, 0 #initialize A reg
+ori $9, $0, 32 #initialize N
 loop:
-// save reg if mult done
-beq $7, $0, save
-add $9, $9, $6
-addi $7, $7, -1
-j loop
-
-save:si
+ori $11, $0, 1
+andi $12, $6, 0x1
+bne $12, $11, shift
+#A<-A+B
+add $8,$8, $7
+shift:
+sllv $7, $11, $7
+srlv $6, $11, $6
+addi $9, $9, -1
+bne $9, $0, loop
+save: 
 addi $29, $29, -4
-sw $9, 0($29)
+sw $8, 0($29)
 j mult_procedure
 
 exit:

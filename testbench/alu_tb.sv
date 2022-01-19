@@ -21,7 +21,7 @@ test PROG(CLK, aluif);
     .\aluif.zero     (aluif.zero    ),
     .\aluif.outport  (aluif.outport ),
     .\aluif.portA    (aluif.portA   ),
-    .\aluif.portB    (aluif.portB   ),
+    .\aluif.portB    (aluif.portB   )
   );
 `endif
 
@@ -34,7 +34,7 @@ initial begin
     aluif.portB = 32'h8; //111100000000
     //result should be 0xf00
     @(negedge CLK)
-    if (aluif.outport == (aluif.portA << aluif.portB))begin
+    if (aluif.outport == (aluif.portB << aluif.portA))begin
         $display("test passed %b", aluif.aluop);
     end
     else $display("!!!!!!!!!!Error %b", aluif.aluop);
@@ -45,7 +45,7 @@ initial begin
     aluif.portB = 32'h4;
     //result should be 0x0f000000
     @(negedge CLK)
-    if (aluif.outport == (aluif.portA >> aluif.portB))begin
+    if (aluif.outport == (aluif.portB >> aluif.portA))begin
         $display("test passed %b", aluif.aluop);
     end
     else $display("!!!!!!!!!!Error %b", aluif.aluop);

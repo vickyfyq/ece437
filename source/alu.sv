@@ -2,7 +2,7 @@
 `include "cpu_types_pkg.vh"
 
 module alu(
-alu_if aluif
+alu_if.alu aluif
 );
 import cpu_types_pkg::*;
 
@@ -10,8 +10,8 @@ always_comb begin
     aluif.overflow = 0;
 
     casez(aluif.aluop) 
-    ALU_SLL  :aluif.outport = aluif.portA << aluif.portB;
-    ALU_SRL  :aluif.outport = aluif.portA >> aluif.portB;
+    ALU_SLL  :aluif.outport = aluif.portB << aluif.portA;
+    ALU_SRL  :aluif.outport = aluif.portB >> aluif.portA;
     ALU_ADD  : 
     begin 
         aluif.outport = $signed(aluif.portA) + $signed(aluif.portB);

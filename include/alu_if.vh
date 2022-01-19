@@ -11,6 +11,14 @@ interface alu_if;
     word_t portA, portB, outport;
     logic negative, overflow, zero;
 
+modport alu (
+input aluop, portA, portB,
+output outport, negative, overflow,zero);
+
+modport tb (
+output aluop, portA, portB,
+input outport, negative, overflow,zero);
+
 endinterface
 
 `endif //REGISTER_FILE_IF_VH
