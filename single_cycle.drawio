@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-01-31T19:10:31.469Z" agent="5.0 (X11)" etag="RnDpC3npz7ZUHk39KRap" version="16.5.2" type="github">
+<mxfile host="app.diagrams.net" modified="2022-01-31T22:23:26.660Z" agent="5.0 (X11)" etag="svpZpZi9IBR-cPw_xVdH" version="16.5.2" type="github">
   <diagram id="XHscCJ2Uq73kOh_t9XDs" name="Page-1">
-    <mxGraphModel dx="2484" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2319" dy="722" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -216,6 +216,9 @@
         <mxCell id="Bbkdj-QdAkM-KLULdxjA-81" value="rdat1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" parent="1" vertex="1">
           <mxGeometry x="160" y="270" width="40" height="20" as="geometry" />
         </mxCell>
+        <mxCell id="-RU0XATvKuKF_UsgDC3E-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="Bbkdj-QdAkM-KLULdxjA-82" target="Bbkdj-QdAkM-KLULdxjA-100">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="Bbkdj-QdAkM-KLULdxjA-82" value="rdat2" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" parent="1" vertex="1">
           <mxGeometry x="140" y="347.5" width="40" height="20" as="geometry" />
         </mxCell>
@@ -414,8 +417,8 @@
             <mxPoint x="452" y="290" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Bbkdj-QdAkM-KLULdxjA-136" value="&lt;div&gt;MemtoReg:&lt;/div&gt;&lt;div&gt; 0-&amp;gt;aluout 1-&amp;gt;dmem&lt;/div&gt;, 2-&amp;gt; pc+4" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;strokeWidth=1;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="399.02" y="275" width="130" height="50" as="geometry" />
+        <mxCell id="Bbkdj-QdAkM-KLULdxjA-136" value="&lt;div&gt;MemtoReg:&lt;/div&gt;&lt;div&gt; 0-&amp;gt;aluout 1-&amp;gt;dmem&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;strokeWidth=1;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="399.02" y="285" width="130" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Bbkdj-QdAkM-KLULdxjA-138" value="" style="endArrow=classic;html=1;rounded=0;fontColor=#000000;strokeColor=#9673a6;strokeWidth=2;fillColor=#e1d5e7;entryX=0.048;entryY=0.017;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="Bbkdj-QdAkM-KLULdxjA-48" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -553,6 +556,18 @@
         </mxCell>
         <mxCell id="-RU0XATvKuKF_UsgDC3E-3" value="R31" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="-195" y="420" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-RU0XATvKuKF_UsgDC3E-8" value="" style="endArrow=classic;html=1;rounded=0;labelBackgroundColor=default;fontFamily=Helvetica;fontSize=13;fontColor=#FF3333;strokeColor=#FF3333;strokeWidth=7;fillColor=#e1d5e7;shape=connector;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="80" y="100" as="sourcePoint" />
+            <mxPoint x="80" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-RU0XATvKuKF_UsgDC3E-9" value="PC+4" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=13;fontFamily=Helvetica;fontColor=#FF3333;" vertex="1" parent="1">
+          <mxGeometry x="75" y="90" width="50" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-RU0XATvKuKF_UsgDC3E-10" value="&lt;div&gt;If op == JAL&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;RegWr=1 write data = PC+4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=13;fontColor=#FF3333;" vertex="1" parent="1">
+          <mxGeometry x="-101" y="80" width="171" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
