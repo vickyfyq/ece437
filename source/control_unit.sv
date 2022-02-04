@@ -10,7 +10,7 @@ opcode_t opcode;
 funct_t funct;
 
 always_comb begin
-opcode =opcode_t'(cuif.instruction[32:26]);
+opcode =opcode_t'(cuif.instruction[31:26]);
 funct = funct_t'(cuif.instruction[5:0]);
 //initialization
 // cuif.lw = 0;
@@ -204,6 +204,8 @@ else begin
         cuif.signext = 1;
         cuif.MemtoReg = 1;
         cuif.ALUSrc = 1;
+        cuif.RegWr = 1;
+        
        // cuif.lw = 1;
     end
     SW    :begin

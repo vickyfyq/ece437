@@ -60,9 +60,9 @@ module datapath (
   //register file connections
   assign rfif.rsel1 = rtype.rs; //apply for both rtype and itype doesnt matter
   assign rfif.rsel2 = rtype.rt;
-  assign rfif.WEN = cuif.RegWr;
+  assign rfif.WEN = cuif.RegWr & (dpif.ihit | dpif.dhit);
   assign rfif.wsel = cuif.RegDst == 2'd0 ?itype.rt:(cuif.RegDst == 2'd1 ? rtype.rd : 5'b11111);
-  assign rfif.wdat = cuif.jal ? pc_p4 : (cuif.RegWr ? aluif.outport : dpif.dmemload);
+  assign rfif.wdat = cuif.jal ? pc_p4 : (cuif.MemtoReg==0 ? aluif.outport : dpif.dmemload);
 
   //alu connections
     //different imm

@@ -125,8 +125,7 @@ program test(input logic CLK, output logic nRST, system_if.tb syif);
   end
 
   task automatic dump_memory();
-    string filename = "memsim:/memory_control_tb/ccif/dstore
-    cpu.hex";
+    string filename = "memcpu.hex";
     int memfd;
 
     syif.tbCTRL = 1;
