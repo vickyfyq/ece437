@@ -9,11 +9,41 @@ interface datapath_cache_if;
   // import types
   import cpu_types_pkg::*;
 
+  typedef struct packed {
+    //Decode signals
+    word_t imemload;
+    //logic zeroext, signext, lui; //ExtOp: zeroext, signext, lui 
+    
+    //Execute signals
+    word_t rdat1, rdat2, cur_imm, pc_p4, jumpAddr;
+    logic [1:0] RegDst; //RegDst: 0->rt, 1->rd, 2->r31
+    logic ALUSrc; //ALUSrc: 0->regB, 1->imm
+    aluop_t ALUOp; 
+    regbits_t rt, rd;
+    
+    //Memory signals
+    word_t branchAddr, ALUout, npc;
+    logic MemWr, MemRead;
+    logic beq, bne; // branch && zero flag : 
+                  //0<pc+4, 1<- pc+4+ signext(imm16)<< 2
+                  //1<- beq, 2<-bne
+    logic jump, jreg , jal; //jump :  1<- {pc+4[31:28], addr,00 },2<-R[rs]
+    logic zero;
+    //Write back signals
+    word_t dmemload;
+    logic MemtoReg;//MemtoReg:0->aluout 1->dmemload
+    logic RegWr; 
+    logic Halt;
+    regbits_t WrDest; // wsel
+  } pipe_control;
+
+pipe_control id, ex, mem, wb;
+
 // datapath signals
 // Fetch
-word_t  if_pc4, if_imemload;
+word_t  if_pc_p4, if_imemload;
 // Decode
-    word_t id_imemload, id_pc4;
+    word_t id_imemload, id_pc_p4;
     logic id_RegWr; 
     logic[1:0] id_RegDst; //RegDst: 0->rt, 1->rd, 2->r31
     logic id_zeroext, id_signext, id_lui; //ExtOp: zeroext, signext, lui 
@@ -28,7 +58,7 @@ word_t  if_pc4, if_imemload;
     logic id_Halt;
 
 // Execute
-    word_t ex_pc4, ex_rdat1, ex_rdat2, ex_imemload, ex_cur_imm, ex_branchAddr, ex_ALUout, ex_jumpAddr;
+    word_t ex_pc_p4, ex_rdat1, ex_rdat2, ex_imemload, ex_cur_imm, ex_branchAddr, ex_ALUout, ex_jumpAddr;
     logic ex_RegWr; 
     logic[1:0] ex_RegDst; //RegDst: 0->rt, 1->rd, 2->r31
     logic ex_ALUSrc; //ALUSrc: 0->regB, 1->imm

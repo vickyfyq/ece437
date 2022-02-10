@@ -17,25 +17,13 @@
 
 module datapath (
   input logic CLK, nRST,
-  datapath_cache_if.dp dpif
+  datapath_cache_if.dp dcif,
+  datapath_if dpif
 );
   // import types
   import cpu_types_pkg::*;
 
-  // pc init
-  parameter PC_INIT = 0;
-
-  control_unit_if cuif();
-  request_unit_if ruif();
-  register_file_if rfif();
-  alu_if aluif();
-  
-  //DUT
-  control_unit CU (cuif);
-  request_unit RU (CLK, nRST, ruif);
-  register_file RF (CLK, nRST, rfif);
-  alu ALU (aluif);
-
+  // pc initdpif
   word_t pc, npc, pc_p4;
   assign pc_p4 = pc+4;
   j_t jtype;
@@ -43,26 +31,26 @@ module datapath (
   r_t rtype;
 
   //initialize instructions stuff
-  assign cuif.instruction = dpif.imemload;
-  assign itype = dpif.imemload;
-  assign rtype = dpif.imemload;
-  assign jtype = dpif.imemload;
+  assign cuif.instruction = dcif.imemload;
+  assign itype = dcif.imemload;
+  assign rtype = dcif.imemload;
+  assign jtype = dcif.imemload;
   //pcenable
   logic pcen;
-  assign pcen = dpif.ihit && (~dpif.ihit);
+  assign pcen = dcif.ihit && (~dcif.ihit);
 
   //request unit connections
-  assign ruif.dhit = dpif.dhit;
-  assign ruif.ihit = dpif.ihit;
+  assign ruif.dhit = dcif.dhit;
+  assign ruif.ihit = dcif.ihit;
   assign ruif.MemtoReg = cuif.MemtoReg;
   assign ruif.MemWr = cuif.MemWr;
 
   //register file connections
   assign rfif.rsel1 = rtype.rs; //apply for both rtype and itype doesnt matter
   assign rfif.rsel2 = rtype.rt;
-  assign rfif.WEN = cuif.RegWr & (dpif.ihit | dpif.dhit);
+  assign rfif.WEN = cuif.RegWr & (dcif.ihit | dcif.dhit);
   assign rfif.wsel = cuif.RegDst == 2'd0 ?itype.rt:(cuif.RegDst == 2'd1 ? rtype.rd : 5'b11111);
-  assign rfif.wdat = cuif.jal ? pc_p4 : (cuif.MemtoReg==0 ? aluif.outport : dpif.dmemload);
+  assign rfif.wdat = cuif.jal ? pc_p4 : (cuif.MemtoReg==0 ? aluif.outport : dcif.dmemload);
 
   //alu connections
     //different imm
@@ -113,17 +101,93 @@ module datapath (
 
   always_ff@ (posedge CLK, negedge nRST) begin
     if(!nRST)  pc<= 32'b0;
-    else if(dpif.ihit&!dpif.dhit) pc <= npc;
+    else if(dcif.ihit&!dcif.dhit) pc <= npc;
   end
 
   //datapath output
-  assign dpif.halt = halt;
-  assign dpif.imemREN = 1;
-  assign dpif.dmemREN = ruif.dmemREN;
-  assign dpif.dmemWEN = ruif.dmemWEN;
-  assign dpif.dmemstore = rfif.rdat2;
-  assign dpif.dmemaddr = aluif.outport;
-  assign dpif.imemaddr = pc;
+  assign dcif.halt = halt;
+  assign dcif.imemREN = 1;
+  assign dcif.dmemREN = ruif.dmemREN;
+  assign dcif.dmemWEN = ruif.dmemWEN;
+  assign dcif.dmemstore = rfif.rdat2;
+  assign dcif.dmemaddr = aluif.outport;
+  assign dcif.imemaddr = pc;
 
-  
+/////////////////////////////// Pipeline /////////////////////////////////////////
+  //Decode Latch Logic
+  always_ff @ (posedge CLK, negedge nRST) begin
+    if(nRST == 0) begin
+      dpif.id = '0; //'{default:'0}
+    end
+    else begin 
+      dpif.id.imemload = dcif.imemload;
+      dpif.id.pc_p4 = pc_p4;
+    end
+  end
+  //Execute Latch Logic
+  always_ff @ (posedge CLK, negedge nRST) begin
+    if(nRST == 0) begin
+      dpif.ex = '0;  //'{default:'0}
+    end
+    else begin 
+      //Control unit signals
+      dpif.ex.RegDst = cuif.RegDst;
+      dpif.ex.ALUSrc = cuif.ALUSrc;
+      dpif.ex.ALUop  = cuif.ALUop;
+      dpif.ex.MemWr  = cuif.MemWr;
+      dpif.ex.beq    = cuif.beq;
+      dpif.ex.bne    = cuif.bne;
+      dpif.ex.jump   = cuif.jump;
+      dpif.ex.jreg   = cuif.jreg;
+      dpif.ex.jal    = cuif.jal;
+      dpif.ex.RegWr  = cuif.RegWr;
+      dpif.ex.MemtoReg = cuif.MemtoReg;
+      dpif.ex.Halt   = cuif.halt;
+      // Others
+      dpif.ex.rdat1  = rfif.rdat1;
+      dpif.ex.rdat2  = rfif.rdat2;
+      dpif.ex.cur_imm = cur_imm;
+      dpif.ex.rt     = rtype.rt;
+      dpif.ex.rd     = rtype.rd;
+    end
+  end
+  // Memory Latch Logic
+  always_ff @ (posedge CLK, negedge nRST) begin
+    if(nRST == 0) begin
+      dpif.mem = '0;  //'{default:'0}
+    end
+    else begin 
+      //Control unit signals
+      dpif.mem.MemWr  = dpif.ex.MemWr;
+      dpif.mem.beq    = dpif.ex.beq;
+      dpif.mem.bne    = dpif.ex.bne;
+      dpif.mem.jump   = dpif.ex.jump;
+      dpif.mem.jreg   = dpif.ex.jreg;
+      dpif.mem.jal    = dpif.ex.jal;
+      dpif.mem.RegWr  = dpif.ex.RegWr;
+      dpif.mem.MemtoReg = dpif.ex.MemtoReg;
+      dpif.mem.Halt   = dpif.ex.halt;
+
+      // Others
+      dpif.mem.ALUout = aluif.outport;
+      dpif.mem.rdat2  = rfif.rdat2;
+      dpif.mem.npc    = npc;
+    end
+  end
+  // Write Back Latch Logic
+  always_ff @ (posedge CLK, negedge nRST) begin
+    if(nRST == 0) begin
+      dpif.wb = '0;  //'{default:'0}
+    end
+    else begin 
+      //Control unit signals
+      dpif.wb.RegWr  = dpif.ex.RegWr;
+      dpif.wb.MemtoReg = dpif.ex.MemtoReg;
+      dpif.wb.Halt   = dpif.ex.halt;
+
+      // Others
+      dpif.wb.dmemload  = dcif.dmemload;
+      dpif.wb.rdat2  = rfif.rdat2;
+    end
+  end
 endmodule
