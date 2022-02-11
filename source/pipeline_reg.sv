@@ -86,10 +86,12 @@ module pipeline_reg(
 /////////////////////     MEMWB STAGE    ///////////////////////////
         prif.wb.npc    <= prif.mem.npc;
       //Control unit signals
-        prif.mem.MemWr <= 0;
-        prif.mem.MemtoReg <= 0;
-        
+        // prif.mem.MemWr <= 0;
+        // prif.mem.MemtoReg <= 0;
+        prif.mem <= '0;
       prif.wb.RegWr    <= prif.mem.RegWr;
+      prif.wb.RegWr    <= prif.mem.RegWr;
+      prif.wb.MemtoReg <= prif.mem.MemtoReg;
       
       prif.wb.Halt     <= prif.mem.Halt;
       prif.wb.jal      <= prif.mem.jal;

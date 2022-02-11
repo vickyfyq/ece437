@@ -39,3 +39,46 @@ processing file asmFiles/try.asm (1 of 1)
 processing file asmFiles/try.asm (1 of 1)
 processing file asmFiles/try.asm (1 of 1)
 processing file asmFiles/try.asm (1 of 1)
+processing file asmFiles/try.asm (1 of 1)
+processing file asmFiles/test.ldst1.asm (1 of 1)
+--- memsim.hex	2022-02-11 04:59:17.881149057 -0500
++++ memcpu.hex	2022-02-11 04:59:17.827147018 -0500
+@@ -15,7 +15,7 @@
+ :04003C000000733716
+ :04003D000000270197
+ :04003E000000133774
+-:040040000000733712
+-:040041000000270193
+-:040042000000133770
++:04004000000000F0CC
++:04004100000000F4C7
++:04004200000000F8C2
+ :00000001FF
+processing file asmFiles/test.ldst1.asm (1 of 1)
+processing file asmFiles/test.ldst1.asm (1 of 1)
+--- memsim.hex	2022-02-11 05:05:52.727058021 -0500
++++ memcpu.hex	2022-02-11 05:05:52.669055831 -0500
+@@ -15,7 +15,7 @@
+ :04003C000000733716
+ :04003D000000270197
+ :04003E000000133774
+-:040040000000733712
+-:040041000000270193
+-:040042000000133770
++:04004000000000F0CC
++:04004100000000F4C7
++:04004200000000F8C2
+ :00000001FF
+processing file asmFiles/test.ldst1.asm (1 of 1)
+processing file asmFiles/test.ldst2.asm (1 of 1)
+--- memsim.hex	2022-02-11 05:15:53.748751848 -0500
++++ memcpu.hex	2022-02-11 05:15:53.690749658 -0500
+@@ -13,7 +13,7 @@
+ :040200000000733750
+ :0402010000002701D1
+ :0402020000001337AE
+-:04020300FEEDBEEF5F
++:040203000000BEEF4A
+ :0403C000000073378F
+ :0403C1000000270110
+ :0403C20000001337ED

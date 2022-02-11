@@ -805,3 +805,464 @@ Reading pref.tcl
 #  exit
 # End time: 04:35:34 on Feb 11,2022, Elapsed time: 0:00:14
 # Errors: 0, Warnings: 0
+processing file asmFiles/try.asm (1 of 1)
+vlog  +acc -sv12compat -mfcu -lint +incdir+include -suppress 12110  source/pipeline_reg.sv
+QuestaSim vlog 10.7a Compiler 2018.03 Mar 26 2018
+Start time: 04:59:00 on Feb 11,2022
+vlog "+acc" -sv12compat -mfcu -lint "+incdir+include" -suppress 12110 source/pipeline_reg.sv 
+-- Compiling package cpu_types_pkg
+-- Compiling interface pipeline_reg_if
+-- Importing package cpu_types_pkg
+-- Compiling module pipeline_reg
+
+Top level modules:
+	pipeline_reg
+End time: 04:59:01 on Feb 11,2022, Elapsed time: 0:00:01
+Errors: 0, Warnings: 0
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 04:59:03 on Feb 11,2022
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Halted at 600 time and ran for         29 cycles.
+# Starting memory dump.
+# Finished memory dump.
+# End time: 04:59:04 on Feb 11,2022, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+10 instructions
+processing file asmFiles/test.ldst1.asm (1 of 1)
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 04:59:17 on Feb 11,2022
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Halted at 960 time and ran for         47 cycles.
+# Starting memory dump.
+# Finished memory dump.
+# End time: 04:59:17 on Feb 11,2022, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+14 instructions
+--- memsim.hex	2022-02-11 04:59:17.881149057 -0500
++++ memcpu.hex	2022-02-11 04:59:17.827147018 -0500
+@@ -15,7 +15,7 @@
+ :04003C000000733716
+ :04003D000000270197
+ :04003E000000133774
+-:040040000000733712
+-:040041000000270193
+-:040042000000133770
++:04004000000000F0CC
++:04004100000000F4C7
++:04004200000000F8C2
+ :00000001FF
+processing file asmFiles/test.ldst1.asm (1 of 1)
+vlog  +acc -sv12compat -mfcu -lint +incdir+include -suppress 12110  source/pipeline_reg.sv
+QuestaSim vlog 10.7a Compiler 2018.03 Mar 26 2018
+Start time: 05:04:11 on Feb 11,2022
+vlog "+acc" -sv12compat -mfcu -lint "+incdir+include" -suppress 12110 source/pipeline_reg.sv 
+-- Compiling package cpu_types_pkg
+-- Compiling interface pipeline_reg_if
+-- Importing package cpu_types_pkg
+-- Compiling module pipeline_reg
+
+Top level modules:
+	pipeline_reg
+End time: 05:04:11 on Feb 11,2022, Elapsed time: 0:00:00
+Errors: 0, Warnings: 0
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 05:04:13 on Feb 11,2022
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Break key hit
+# Break in Module memory_control at source/memory_control.sv line 27
+# Stopped at source/memory_control.sv line 27
+#  exit
+# End time: 05:04:38 on Feb 11,2022, Elapsed time: 0:00:25
+# Errors: 0, Warnings: 0
+processing file asmFiles/test.ldst1.asm (1 of 1)
+vlog  +acc -sv12compat -mfcu -lint +incdir+include -suppress 12110  source/pipeline_reg.sv
+QuestaSim vlog 10.7a Compiler 2018.03 Mar 26 2018
+Start time: 05:05:48 on Feb 11,2022
+vlog "+acc" -sv12compat -mfcu -lint "+incdir+include" -suppress 12110 source/pipeline_reg.sv 
+-- Compiling package cpu_types_pkg
+-- Compiling interface pipeline_reg_if
+-- Importing package cpu_types_pkg
+-- Compiling module pipeline_reg
+
+Top level modules:
+	pipeline_reg
+End time: 05:05:49 on Feb 11,2022, Elapsed time: 0:00:01
+Errors: 0, Warnings: 0
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 05:05:50 on Feb 11,2022
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Halted at 960 time and ran for         47 cycles.
+# Starting memory dump.
+# Finished memory dump.
+# End time: 05:05:52 on Feb 11,2022, Elapsed time: 0:00:02
+# Errors: 0, Warnings: 0
+14 instructions
+--- memsim.hex	2022-02-11 05:05:52.727058021 -0500
++++ memcpu.hex	2022-02-11 05:05:52.669055831 -0500
+@@ -15,7 +15,7 @@
+ :04003C000000733716
+ :04003D000000270197
+ :04003E000000133774
+-:040040000000733712
+-:040041000000270193
+-:040042000000133770
++:04004000000000F0CC
++:04004100000000F4C7
++:04004200000000F8C2
+ :00000001FF
+processing file asmFiles/test.ldst1.asm (1 of 1)
+vlog  +acc -sv12compat -mfcu -lint +incdir+include -suppress 12110  source/pipeline_reg.sv
+QuestaSim vlog 10.7a Compiler 2018.03 Mar 26 2018
+Start time: 05:15:32 on Feb 11,2022
+vlog "+acc" -sv12compat -mfcu -lint "+incdir+include" -suppress 12110 source/pipeline_reg.sv 
+-- Compiling package cpu_types_pkg
+-- Compiling interface pipeline_reg_if
+-- Importing package cpu_types_pkg
+-- Compiling module pipeline_reg
+
+Top level modules:
+	pipeline_reg
+End time: 05:15:33 on Feb 11,2022, Elapsed time: 0:00:01
+Errors: 0, Warnings: 0
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 05:15:34 on Feb 11,2022
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Halted at 960 time and ran for         47 cycles.
+# Starting memory dump.
+# Finished memory dump.
+# End time: 05:15:36 on Feb 11,2022, Elapsed time: 0:00:02
+# Errors: 0, Warnings: 0
+14 instructions
+processing file asmFiles/test.ldst2.asm (1 of 1)
+Reading pref.tcl
+
+# 10.7a
+
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# ** Warning: Multiple occurences of ini variable ToggleWidthLimit are found, only first occurence will be considered.
+# vsim -coverage -suppress 12110 -c -do "run -all; exit;" -L altera_mf_ver -L altera_ver -L cycloneive_ver -wlf system_tb.wlf work.system_tb 
+# Start time: 05:15:52 on Feb 11,2022
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.system_tb(fast)
+# Loading work.cpu_types_pkg(fast)
+# Loading work.system_if(fast)
+# Loading work.test(fast)
+# Loading work.system(fast)
+# Loading work.cpu_ram_if(fast)
+# Loading work.pipeline(fast)
+# Loading work.datapath_cache_if(fast)
+# Loading work.caches_if(fast__1)
+# Loading work.cache_control_if(fast)
+# Loading work.datapath(fast)
+# Loading work.pipeline_reg_if(fast)
+# Loading work.control_unit_if(fast)
+# Loading work.request_unit_if(fast)
+# Loading work.register_file_if(fast)
+# Loading work.alu_if(fast)
+# Loading work.control_unit(fast)
+# Loading work.request_unit(fast)
+# Loading work.register_file(fast)
+# Loading work.alu(fast)
+# Loading work.pipeline_reg(fast)
+# Loading work.caches(fast)
+# Loading work.memory_control(fast)
+# Loading work.ram(fast)
+# Loading altera_mf_ver.altsyncram(fast)
+# run -all
+# Starting Processor.
+# Halted at 1040 time and ran for         51 cycles.
+# Starting memory dump.
+# Finished memory dump.
+# End time: 05:15:53 on Feb 11,2022, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+15 instructions
+--- memsim.hex	2022-02-11 05:15:53.748751848 -0500
++++ memcpu.hex	2022-02-11 05:15:53.690749658 -0500
+@@ -13,7 +13,7 @@
+ :040200000000733750
+ :0402010000002701D1
+ :0402020000001337AE
+-:04020300FEEDBEEF5F
++:040203000000BEEF4A
+ :0403C000000073378F
+ :0403C1000000270110
+ :0403C20000001337ED
