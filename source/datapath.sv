@@ -55,7 +55,7 @@ module datapath (
   //register file connections
   assign rfif.rsel1 = idrtype.rs; //apply for both rtype and itype doesnt matter
   assign rfif.rsel2 = idrtype.rt;
-  assign rfif.WEN = prif.wb.RegWr & (dcif.ihit | dcif.dhit);
+  assign rfif.WEN = prif.wb.RegWr ;//& (dcif.ihit | dcif.dhit);
   assign WrDest = prif.ex.RegDst== 2'd0 ?prif.ex.rt:( prif.ex.RegDst == 2'd1 ? prif.ex.rd : 5'b11111);
   assign rfif.wsel = prif.wb.WrDest;
   assign rfif.wdat = prif.wb.jal ? prif.wb.npc : (prif.wb.MemtoReg==0 ? prif.wb.ALUout :prif.wb.dmemload);
