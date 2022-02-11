@@ -14,7 +14,7 @@ interface pipeline_reg_if;
     word_t imemload;
     
     //Execute signals
-    word_t rdat1, rdat2, cur_imm, npc;
+    word_t rdat1, rdat2, cur_imm;
     logic [1:0] RegDst; //RegDst: 0->rt, 1->rd, 2->r31
     logic ALUSrc; //ALUSrc: 0->regB, 1->imm
     aluop_t ALUOp; 
@@ -39,19 +39,19 @@ interface pipeline_reg_if;
 
   typedef struct packed {
     //mux
-    word_t ALUout;
+    word_t ALUout,npc;
     word_t dmemload;
     //control
     logic MemtoReg;
     logic RegWr; 
-    logic Halt;
+    logic Halt,  jal;
     //wsel
     regbits_t WrDest;
 
   } pipe_control_memwb;
   
   typedef struct packed {  
-    word_t rdat1, rdat2;
+    word_t rdat1, rdat2,npc;
     logic zero;
     word_t branchAddr, jumpAddr, ALUout;
     //WSEL
@@ -72,7 +72,7 @@ interface pipeline_reg_if;
     word_t imemload;
     
     //Execute signals
-    word_t rdat1, rdat2, cur_imm, npc;
+    word_t rdat1, rdat2, cur_imm;
     logic [1:0] RegDst; 
     logic ALUSrc; 
     aluop_t ALUOp; 
@@ -95,7 +95,7 @@ interface pipeline_reg_if;
   typedef struct packed {
     //Decode signals
     word_t imemload, npc;
-  } pipe_control_idex;
+  } pipe_control_ifid;
 
 pipe_control_memwb wb;
 pipe_control_exmem mem;
@@ -120,7 +120,7 @@ regbits_t in_rt, in_rd;
 word_t in_ALUout;
 logic in_zero;
 regbits_t in_WrDest;
-word_t dmemload;
+word_t in_dmemload;
 
 endinterface
 

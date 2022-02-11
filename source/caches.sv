@@ -19,29 +19,29 @@ module caches (
   caches_if cif
 );
 
-  word_t instr;
-  word_t daddr;
+  // word_t instr;
+  // word_t daddr;
 
   // icache
   //icache  ICACHE(dcif, cif);
   // dcache
   //dcache  DCACHE(dcif, cif);
 
-  // single cycle instr saver (for memory ops)
-  always_ff @(posedge CLK)
-  begin
-    if (!nRST)
-    begin
-      instr <= '0;
-      daddr <= '0;
-    end
-    else
-    if (dcif.ihit)
-    begin
-      instr <= cif.iload;
-      daddr <= dcif.dmemaddr;
-    end
-  end
+  // // single cycle instr saver (for memory ops)
+  // always_ff @(posedge CLK)
+  // begin
+  //   if (!nRST)
+  //   begin
+  //     instr <= '0;
+  //     daddr <= '0;
+  //   end
+  //   else
+  //   if (dcif.ihit)
+  //   begin
+  //     instr <= cif.iload;
+  //     daddr <= dcif.dmemaddr;
+  //   end
+  // end
   // dcache invalidate before halt
   assign dcif.flushed = dcif.halt;
 

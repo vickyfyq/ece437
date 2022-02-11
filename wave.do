@@ -18,21 +18,21 @@ add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jump
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jreg
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jal
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/Halt
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/RF/registers
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/WEN
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/wsel
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel1
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel2
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/wdat
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat1
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat2
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/aluop
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/portA
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/portB
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/outport
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/negative
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/overflow
-add wave -noupdate -group ALU /system_tb/DUT/CPU/DP/aluif/zero
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/RF/registers
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/WEN
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/wsel
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel1
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel2
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/wdat
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat1
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat2
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/aluop
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/portA
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/portB
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/outport
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/negative
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/overflow
+add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/zero
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/halt
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/ihit
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/imemREN
@@ -46,10 +46,11 @@ add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/flushed
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemload
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemstore
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemaddr
-add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/wb
-add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/mem
-add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/ex
-add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/id
+add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/wb
+add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/mem
+add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/ex
+add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/id
+add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/iditype
 add wave -noupdate -expand -group pipeline -expand -group pipeline_input /system_tb/DUT/CPU/DP/prif/in_imemload
 add wave -noupdate -expand -group pipeline -expand -group pipeline_input /system_tb/DUT/CPU/DP/prif/in_npc
 add wave -noupdate -expand -group pipeline -expand -group pipeline_input /system_tb/DUT/CPU/DP/prif/in_RegDst
@@ -93,7 +94,7 @@ add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/jumpAddr
 add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/nhalt
 add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/halt
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {284516 ps} 0}
+WaveRestoreCursors {{Cursor 1} {135850 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -109,4 +110,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {3150 ns}
+WaveRestoreZoom {0 ps} {682 ns}

@@ -18,8 +18,7 @@
 
 module datapath (
   input logic CLK, nRST,
-  datapath_cache_if.dp dcif,
-
+  datapath_cache_if.dp dcif
 );
   // import types
   import cpu_types_pkg::*;
@@ -37,7 +36,7 @@ module datapath (
   request_unit RU (CLK, nRST, ruif);
   register_file RF (CLK, nRST, rfif);
   alu ALU (aluif);
-  pipeline_reg PR (CLK,nRST,pcif.ihit, pcif.dhit, prif);
+  pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit, prif);
 
   // pc initprif
   word_t pc, npc, pc_p4;
@@ -59,7 +58,7 @@ module datapath (
   assign rfif.WEN = prif.wb.RegWr & (dcif.ihit | dcif.dhit);
   assign WrDest = prif.ex.RegDst== 2'd0 ?prif.ex.rt:( prif.ex.RegDst == 2'd1 ? prif.ex.rd : 5'b11111);
   assign rfif.wsel = prif.wb.WrDest;
-  assign rfif.wdat = prif.mem.jal ? prif.wb.pc_p4 : (prif.wb.MemtoReg==0 ? prif.wb.ALUout :prif.wb.dmemload);
+  assign rfif.wdat = prif.wb.jal ? prif.wb.npc : (prif.wb.MemtoReg==0 ? prif.wb.ALUout :prif.wb.dmemload);
 
 
   //alu connections
@@ -123,7 +122,7 @@ module datapath (
   assign dcif.dmemREN = prif.mem.MemtoReg; 
   assign dcif.dmemWEN = prif.mem.MemWr; 
   assign dcif.dmemstore = prif.mem.rdat2;
-  assign dcif.dmemaddr = prif.mem.outport;
+  assign dcif.dmemaddr = prif.mem.ALUout;
   assign dcif.imemaddr = pc;
 
 
@@ -136,7 +135,7 @@ module datapath (
   //Control unit signals
     assign   prif.in_RegDst   = cuif.RegDst;
     assign   prif.in_ALUSrc   = cuif.ALUSrc;
-    assign   prif.in_ALUop    = cuif.ALUop;
+    assign   prif.in_ALUop    = cuif.ALUOp;
     assign   prif.in_MemWr    = cuif.MemWr;
     assign   prif.in_beq      = cuif.beq;
     assign   prif.in_bne      = cuif.bne;
@@ -160,6 +159,7 @@ module datapath (
     assign   prif.in_zero     = aluif.zero;
     assign   prif.in_branchAddr = branchAddr;
     assign   prif.in_jumpAddr = jumpAddr;
+    assign   prif.in_dmemload = dcif.dmemload;
   //write back register
     assign prif.in_WrDest = WrDest;
 

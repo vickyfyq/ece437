@@ -17,9 +17,9 @@ module pipeline_reg(
     else if(ihit & !dhit)begin //stall when instr not ready
 /////////////////////   IFID STAGE    ///////////////////////////
       //instruction
-      prif.id.imemload <= in_imemload;
+      prif.id.imemload <= prif.in_imemload;
       //pc
-      prif.id.npc      <= in_npc;
+      prif.id.npc      <= prif.in_npc;
 
 /////////////////////   IDEX STAGE    ///////////////////////////
       //instruction
@@ -27,28 +27,29 @@ module pipeline_reg(
       //pc
       prif.ex.npc <= prif.id.npc;      
       //Control unit signals
-      prif.ex.RegDst   <= in_RegDst;
-      prif.ex.ALUSrc   <= in_ALUSrc;
-      prif.ex.ALUop    <= in_ALUop;
-      prif.ex.MemWr    <= in_MemWr;
-      prif.ex.beq      <= in_beq;
-      prif.ex.bne      <= in_bne;
-      prif.ex.jump     <= in_jump;
-      prif.ex.jreg     <= in_jreg;
-      prif.ex.jal      <= in_jal;
-      prif.ex.RegWr    <= in_RegWr;
-      prif.ex.MemtoReg <= in_MemtoReg;
-      prif.ex.Halt     <= in_Halt;
+      prif.ex.RegDst   <= prif.in_RegDst;
+      prif.ex.ALUSrc   <= prif.in_ALUSrc;
+      prif.ex.ALUOp    <= prif.in_ALUop;
+      prif.ex.MemWr    <= prif.in_MemWr;
+      prif.ex.beq      <= prif.in_beq;
+      prif.ex.bne      <= prif.in_bne;
+      prif.ex.jump     <= prif.in_jump;
+      prif.ex.jreg     <= prif.in_jreg;
+      prif.ex.jal      <= prif.in_jal;
+      prif.ex.RegWr    <= prif.in_RegWr;
+      prif.ex.MemtoReg <= prif.in_MemtoReg;
+      prif.ex.Halt     <= prif.in_Halt;
       //register file output
-      prif.ex.rdat1      <= in_rdat1;
-      prif.ex.rdat2      <= in_rdat2;
+      prif.ex.rdat1      <= prif.in_rdat1;
+      prif.ex.rdat2      <= prif.in_rdat2;
       //extended immediate 
-      prif.ex.cur_imm    <= in_cur_imm;
+      prif.ex.cur_imm    <= prif.in_cur_imm;
       //rt rd for WrDest
-      prif.ex.rt       <= in_rt;
-      prif.ex.rd       <= in_rd;
+      prif.ex.rt       <= prif.in_rt;
+      prif.ex.rd       <= prif.in_rd;
 
 /////////////////////   EXMEM STAGE    ///////////////////////////
+      prif.mem.npc    <= prif.ex.npc;
       //Control unit signals
       prif.mem.MemWr    <= prif.ex.MemWr;
       prif.mem.beq      <= prif.ex.beq;
@@ -61,26 +62,43 @@ module pipeline_reg(
       prif.mem.Halt     <= prif.ex.Halt;
       //alu
       prif.mem.rdat2    <= prif.ex.rdat2;
-      prif.mem.ALUout   <= in_outport;
-      prif.mem.zero     <= in_zero;
-      prif.mem.branchAddr <= in_branchAddr;
-      prif.mem.jumpAddr <= in_jumpAddr;
+      prif.mem.ALUout   <= prif.in_ALUout;
+      prif.mem.zero     <= prif.in_zero;
+      prif.mem.branchAddr <= prif.in_branchAddr;
+      prif.mem.jumpAddr <= prif.in_jumpAddr;
       prif.mem.rdat1    <= prif.ex.rdat1;
       //write back register
-      prif.mem.WrDest   <= in_WrDest;
-    end 
-    else if (dhit) begin
-/////////////////////     MEMWB STAGE    ///////////////////////////
+      prif.mem.WrDest   <= prif.in_WrDest;
+      /////////////////////     MEMWB STAGE    ///////////////////////////
+      prif.wb.npc    <= prif.mem.npc;
       //Control unit signals
       prif.wb.RegWr    <= prif.mem.RegWr;
       prif.wb.MemtoReg <= prif.mem.MemtoReg;
       prif.wb.Halt     <= prif.mem.Halt;
-
+      prif.wb.jal      <= prif.mem.jal;
       //wdat
       prif.wb.ALUout   <= prif.mem.ALUout;
-      prif.wb.dmemload <= in_dmemload;
+      prif.wb.dmemload <= prif.in_dmemload;
+      //wsel
+      prif.wb.WrDest   <= prif.mem.WrDest;
+    end 
+    else if (dhit) begin
+/////////////////////     MEMWB STAGE    ///////////////////////////
+        prif.wb.npc    <= prif.mem.npc;
+      //Control unit signals
+        prif.mem.MemWr <= 0;
+        prif.mem.MemtoReg <= 0;
+        
+      prif.wb.RegWr    <= prif.mem.RegWr;
+      
+      prif.wb.Halt     <= prif.mem.Halt;
+      prif.wb.jal      <= prif.mem.jal;
+      //wdat
+      prif.wb.ALUout   <= prif.mem.ALUout;
+      prif.wb.dmemload <= prif.in_dmemload;
       //wsel
       prif.wb.WrDest   <= prif.mem.WrDest;
 
     end
   end
+endmodule
