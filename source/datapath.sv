@@ -8,8 +8,9 @@
 
 // data path interface
 `include "datapath_cache_if.vh"
+`include "pipeline_reg_if.vh"
 `include "control_unit_if.vh"
-`include "request_unit_if.vh"
+
 `include "register_file_if.vh"
 `include "alu_if.vh"
 // alu op, mips op, and instruction type
@@ -18,12 +19,27 @@
 module datapath (
   input logic CLK, nRST,
   datapath_cache_if.dp dcif,
-  datapath_if dpif
+
 );
   // import types
   import cpu_types_pkg::*;
 
-  // pc initdpif
+    // pc init
+  parameter PC_INIT = 0;
+  pipeline_reg_if prif();
+  control_unit_if cuif();
+  request_unit_if ruif();
+  register_file_if rfif();
+  alu_if aluif();
+  
+  //DUT
+  control_unit CU (cuif);
+  request_unit RU (CLK, nRST, ruif);
+  register_file RF (CLK, nRST, rfif);
+  alu ALU (aluif);
+  pipeline_reg PR (CLK,nRST,pcif.ihit, pcif.dhit, prif);
+
+  // pc initprif
   word_t pc, npc, pc_p4;
   assign pc_p4 = pc+4;
   i_t iditype;
@@ -31,19 +47,19 @@ module datapath (
   j_t exjtype;
 
   //initialize instructions stuff
-  assign cuif.instruction = dpif.id.imemload;
-  assign idrtype = dpif.id.imemload;
-  assign iditype = dpif.id.imemload;
-  assign exjtype = dpif.ex.imemload;
+  assign cuif.instruction = prif.id.imemload;
+  assign idrtype = prif.id.imemload;
+  assign iditype = prif.id.imemload;
+  assign exjtype = prif.ex.imemload;
 
   regbits_t WrDest;
   //register file connections
   assign rfif.rsel1 = idrtype.rs; //apply for both rtype and itype doesnt matter
   assign rfif.rsel2 = idrtype.rt;
-  assign rfif.WEN = dpif.wb.RegWr & (dcif.ihit | dcif.dhit);
-  assign WrDest = dpif.ex.RegDst== 2'd0 ?dpif.ex.rt:( dpif.ex.RegDst == 2'd1 ? dpif.ex.rd : 5'b11111);
-  assign rfif.wsel = dpif.wb.WrDest;
-  assign rfif.wdat = dpif.mem.jal ? dpif.wb.pc_p4 : (dpif.wb.MemtoReg==0 ? dpif.wb.ALUout :dpif.wb.dmemload);
+  assign rfif.WEN = prif.wb.RegWr & (dcif.ihit | dcif.dhit);
+  assign WrDest = prif.ex.RegDst== 2'd0 ?prif.ex.rt:( prif.ex.RegDst == 2'd1 ? prif.ex.rd : 5'b11111);
+  assign rfif.wsel = prif.wb.WrDest;
+  assign rfif.wdat = prif.mem.jal ? prif.wb.pc_p4 : (prif.wb.MemtoReg==0 ? prif.wb.ALUout :prif.wb.dmemload);
 
 
   //alu connections
@@ -55,40 +71,40 @@ module datapath (
   //extop does not need to go throught reg
   assign cur_imm = cuif.zeroext ? zeroext_imm : (cuif.lui ? lui_imm : cuif.signext ? signext_imm : 32'h0);
 
-  assign aluif.aluop = dpif.ex.ALUOp;
-  assign aluif.portA = dpif.ex.rdat1;
-  assign aluif.portB = dpif.ex.ALUSrc ? dpif.ex.cur_imm : dpif.ex.rdat2;
+  assign aluif.aluop = prif.ex.ALUOp;
+  assign aluif.portA = prif.ex.rdat1;
+  assign aluif.portB = prif.ex.ALUSrc ? prif.ex.cur_imm : prif.ex.rdat2;
 
 
   word_t branchAddr, jumpAddr;
-  assign jumpAddr = {dpif.ex.npc[31:28], exjtype.addr,2'b00};
-  assign branchAddr = dpif.ex.npc + {dpif.ex.cur_imm[29:0],2'b0};
+  assign jumpAddr = {prif.ex.npc[31:28], exjtype.addr,2'b00};
+  assign branchAddr = prif.ex.npc + {prif.ex.cur_imm[29:0],2'b0};
   //branch jump
   always_comb begin
     npc = pc_p4;
     ///////////////////////////jump///////////////////////////////
-    if (dpif.mem.jump) begin
-      npc = dpif.mem.jumpAddr;
+    if (prif.mem.jump) begin
+      npc = prif.mem.jumpAddr;
     end
-    else if (dpif.mem.jal) begin
-      npc = dpif.mem.jumpAddr;
+    else if (prif.mem.jal) begin
+      npc = prif.mem.jumpAddr;
     end
-    else if (dpif.mem.jreg) begin
-      npc = dpif.mem.rdat1;
+    else if (prif.mem.jreg) begin
+      npc = prif.mem.rdat1;
     end
     ///////////////////////////branch///////////////////////////////////
-    if (dpif.mem.beq && dpif.mem.zero) begin
-      npc = dpif.mem.branchAddr;
+    if (prif.mem.beq && prif.mem.zero) begin
+      npc = prif.mem.branchAddr;
     end
-    else if (dpif.mem.bne && !dpif.mem.zero) begin
-      npc = dpif.mem.branchAddr;
+    else if (prif.mem.bne && !prif.mem.zero) begin
+      npc = prif.mem.branchAddr;
     end
 
   end
 
   //halt register
   logic nhalt,halt;
-  assign nhalt = dpif.wb.Halt;
+  assign nhalt = prif.wb.Halt;
   
   always_ff@ (posedge CLK, negedge nRST) begin
     if(!nRST) halt <= 0;
@@ -104,90 +120,47 @@ module datapath (
   //datapath output
   assign dcif.halt = halt;
   assign dcif.imemREN = 1;
-  assign dcif.dmemREN = dpif.mem.MemtoReg; 
-  assign dcif.dmemWEN = dpif.mem.MemWr; 
-  assign dcif.dmemstore = dpif.mem.rdat2;
-  assign dcif.dmemaddr = dpif.mem.outport;
+  assign dcif.dmemREN = prif.mem.MemtoReg; 
+  assign dcif.dmemWEN = prif.mem.MemWr; 
+  assign dcif.dmemstore = prif.mem.rdat2;
+  assign dcif.dmemaddr = prif.mem.outport;
   assign dcif.imemaddr = pc;
 
-/////////////////////////////// Pipeline /////////////////////////////////////////
 
-  always_ff @ (posedge CLK, negedge nRST) begin
-    if(nRST == 0) begin
-      dpif.id <= '0; //'{default:'0}
-      dpif.ex <= '0;
-      dpif.mem <= '0;
-      dpif.wb <= '0;
-    end
-    else if(dcif.ihit & !dcif.dhit)begin //stall when instr not ready
-/////////////////////   IFID STAGE    ///////////////////////////
-      //instruction
-      dpif.id.imemload <= dcif.imemload;
-      //pc
-      dpif.id.npc      <= npc;
 
-/////////////////////   IDEX STAGE    ///////////////////////////
-      //instruction
-      dpif.ex.imemload <= dpif.id.imemload;
-      //pc
-      dpif.ex.npc <= dpif.id.npc;      
-      //Control unit signals
-      dpif.ex.RegDst   <= cuif.RegDst;
-      dpif.ex.ALUSrc   <= cuif.ALUSrc;
-      dpif.ex.ALUop    <= cuif.ALUop;
-      dpif.ex.MemWr    <= cuif.MemWr;
-      dpif.ex.beq      <= cuif.beq;
-      dpif.ex.bne      <= cuif.bne;
-      dpif.ex.jump     <= cuif.jump;
-      dpif.ex.jreg     <= cuif.jreg;
-      dpif.ex.jal      <= cuif.jal;
-      dpif.ex.RegWr    <= cuif.RegWr;
-      dpif.ex.MemtoReg <= cuif.MemtoReg;
-      dpif.ex.Halt     <= cuif.Halt;
-      //register file output
-      dpif.ex.rdat1      <= rfif.rdat1;
-      dpif.ex.rdat2      <= rfif.rdat2;
-      //extended immediate 
-      dpif.ex.cur_imm    <= cur_imm;
-      //rt rd for WrDest
-      dpif.ex.rt       <= iditype.rt;
-      dpif.ex.rd       <= idrtype.rd;
-
-/////////////////////   EXMEM STAGE    ///////////////////////////
-      //Control unit signals
-      dpif.mem.MemWr    <= dpif.ex.MemWr;
-      dpif.mem.beq      <= dpif.ex.beq;
-      dpif.mem.bne      <= dpif.ex.bne;
-      dpif.mem.jump     <= dpif.ex.jump;
-      dpif.mem.jreg     <= dpif.ex.jreg;
-      dpif.mem.jal      <= dpif.ex.jal;
-      dpif.mem.RegWr    <= dpif.ex.RegWr;
-      dpif.mem.MemtoReg <= dpif.ex.MemtoReg;
-      dpif.mem.Halt     <= dpif.ex.Halt;
-      //alu
-      dpif.mem.rdat2    <= rfif.rdat2;
-      dpif.mem.ALUout   <= aluif.outport;
-      dpif.mem.zero     <= aluif.zero;
-      dpif.mem.branchAddr <= branchAddr;
-      dpif.mem.jumpAddr <= jumpAddr;
-      dpif.mem.rdat1    <= rfif.rdat1;
-      //write back register
-      dpif.mem.WrDest   <= WrDest;
-    end 
-    else if (dcif.dhit) begin
-/////////////////////     MEMWB STAGE    ///////////////////////////
-      //Control unit signals
-      dpif.wb.RegWr    <= dpif.mem.RegWr;
-      dpif.wb.MemtoReg <= dpif.mem.MemtoReg;
-      dpif.wb.Halt     <= dpif.mem.Halt;
-
-      //wdat
-      dpif.wb.ALUout   <= dpif.mem.ALUout;
-      dpif.wb.dmemload <= dcif.dmemload;
-      //wsel
-      dpif.wb.WrDest   <= dpif.mem.WrDest;
-
-    end
-  end
+//input for pipeline
+  assign   prif.in_imemload = dcif.imemload;
+  //pc
+    assign   prif.in_npc      = npc;
+  
+  //Control unit signals
+    assign   prif.in_RegDst   = cuif.RegDst;
+    assign   prif.in_ALUSrc   = cuif.ALUSrc;
+    assign   prif.in_ALUop    = cuif.ALUop;
+    assign   prif.in_MemWr    = cuif.MemWr;
+    assign   prif.in_beq      = cuif.beq;
+    assign   prif.in_bne      = cuif.bne;
+    assign   prif.in_jump     = cuif.jump;
+    assign   prif.in_jreg     = cuif.jreg;
+    assign   prif.in_jal      = cuif.jal;
+    assign   prif.in_RegWr    = cuif.RegWr;
+    assign   prif.in_MemtoReg = cuif.MemtoReg;
+    assign   prif.in_Halt     = cuif.Halt;
+  //register file output
+    assign   prif.in_rdat1      = rfif.rdat1;
+    assign   prif.in_rdat2      = rfif.rdat2;
+  //extended immediate 
+    assign   prif.in_cur_imm    = cur_imm;
+  //rt rd for WrDest
+    assign   prif.in_rt       = iditype.rt;
+    assign   prif.in_rd       = idrtype.rd;
+  
+    //alu
+    assign   prif.in_ALUout   = aluif.outport;
+    assign   prif.in_zero     = aluif.zero;
+    assign   prif.in_branchAddr = branchAddr;
+    assign   prif.in_jumpAddr = jumpAddr;
+  //write back register
+    assign prif.in_WrDest = WrDest;
 
 endmodule
