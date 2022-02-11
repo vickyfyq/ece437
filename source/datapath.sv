@@ -59,8 +59,7 @@ module datapath (
   assign aluif.portA = dpif.ex.rdat1;
   assign aluif.portB = dpif.ex.ALUSrc ? dpif.ex.cur_imm : dpif.ex.rdat2;
 
-  j_t memjtype;
-  memjtype = dpif.mem.imemload;
+
   word_t branchAddr, jumpAddr;
   assign jumpAddr = {dpif.ex.npc[31:28], exjtype.addr,2'b00};
   assign branchAddr = dpif.ex.npc + {dpif.ex.cur_imm[29:0],2'b0};
@@ -174,7 +173,8 @@ module datapath (
       dpif.mem.rdat1    <= rfif.rdat1;
       //write back register
       dpif.mem.WrDest   <= WrDest;
-    end else if (dhit) begin
+    end 
+    else if (dcif.dhit) begin
 /////////////////////     MEMWB STAGE    ///////////////////////////
       //Control unit signals
       dpif.wb.RegWr    <= dpif.mem.RegWr;
