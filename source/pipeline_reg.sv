@@ -23,9 +23,10 @@ assign wb_enable = ihit |dhit;
       //pc
       prif.id.npc      <= prif.in_npc;
       prif.id.pc <= prif.in_pc;
+      
 
 /////////////////////   IDEX STAGE    ///////////////////////////
-      prif.ex.lui_imm   <= prif.id.lui_imm;
+      prif.ex.lui_imm   <= prif.in_lui_imm;
       prif.ex.pc <= prif.id.pc;
       //instruction
       prif.ex.imemload <= prif.id.imemload;
