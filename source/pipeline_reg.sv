@@ -6,7 +6,7 @@ module pipeline_reg(
     pipeline_reg_if prif
 );
 /////////////////////////////// Pipeline /////////////////////////////////////////
-
+assign wb_enable = ihit |dhit;
   always_ff @ (posedge CLK, negedge nRST) begin
     if(nRST == 0) begin
       prif.id <= '0; //'{default:'0}

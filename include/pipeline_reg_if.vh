@@ -102,6 +102,7 @@ pipe_control_exmem mem;
 pipe_control_idex ex;
 pipe_control_ifid id;
 
+logic wb_enable;
 word_t in_imemload, in_npc;
 logic[1:0] in_RegDst;
 logic in_ALUSrc;

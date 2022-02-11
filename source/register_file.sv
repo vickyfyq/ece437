@@ -13,7 +13,7 @@ import cpu_types_pkg::*;
 //32 locations with 32 bits wide each
 word_t [31:0] registers; 
 
-always_ff@ (posedge CLK, negedge nRST) begin
+always_ff@ (negedge CLK, negedge nRST) begin
   if (!nRST) registers <= '{default: '0}; //set all registers to zero 
   else if (rfif.WEN && rfif.wsel != '0)  registers[rfif.wsel] <= rfif.wdat; //write data into selected regs and reg 0 is always 0
 

@@ -7,7 +7,7 @@ nop
 nop
 beq $4, $4, branch
 ori $5, $0, 0xBAD
-nop
+#nop
 sw  $5, 0($3)
 j   end
 branch:

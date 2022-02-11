@@ -42,8 +42,9 @@ module datapath (
   word_t pc, npc, pc_p4;
   assign pc_p4 = pc+4;
   i_t iditype;
-  r_t idrtype;
+  r_t idrtype, rtype;
   j_t exjtype;
+  assign rtype = dcif.imemload; //for cpu tracker
 
   //initialize instructions stuff
   assign cuif.instruction = prif.id.imemload;
