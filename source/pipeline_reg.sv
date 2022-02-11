@@ -5,6 +5,8 @@ module pipeline_reg(
     input logic CLK, nRST, ihit, dhit,
     pipeline_reg_if prif
 );
+assign wb_enable = ihit | dhit;
+
 /////////////////////////////// Pipeline /////////////////////////////////////////
 
   always_ff @ (posedge CLK, negedge nRST) begin
@@ -20,8 +22,11 @@ module pipeline_reg(
       prif.id.imemload <= prif.in_imemload;
       //pc
       prif.id.npc      <= prif.in_npc;
+      prif.id.pc <= prif.in_pc;
 
 /////////////////////   IDEX STAGE    ///////////////////////////
+      prif.ex.lui_imm   <= prif.id.lui_imm;
+      prif.ex.pc <= prif.id.pc;
       //instruction
       prif.ex.imemload <= prif.id.imemload;
       //pc
@@ -50,6 +55,10 @@ module pipeline_reg(
 
 /////////////////////   EXMEM STAGE    ///////////////////////////
       prif.mem.npc    <= prif.ex.npc;
+prif.mem.imemload <= prif.ex.imemload;
+prif.mem.pc <= prif.ex.pc;
+      prif.mem.cur_imm    <= prif.ex.cur_imm;
+      prif.mem.lui_imm   <= prif.ex.lui_imm;
       //Control unit signals
       prif.mem.MemWr    <= prif.ex.MemWr;
       prif.mem.beq      <= prif.ex.beq;
@@ -71,6 +80,12 @@ module pipeline_reg(
       prif.mem.WrDest   <= prif.in_WrDest;
       /////////////////////     MEMWB STAGE    ///////////////////////////
       prif.wb.npc    <= prif.mem.npc;
+      prif.wb.imemload <= prif.mem.imemload;
+      prif.wb.branchAddr <= prif.mem.branchAddr;
+      prif.wb.pc <= prif.mem.pc;
+      prif.wb.cur_imm    <= prif.mem.cur_imm;
+      prif.wb.lui_imm   <= prif.mem.lui_imm;
+      prif.wb.rdat2    <= prif.mem.rdat2;
       //Control unit signals
       prif.wb.RegWr    <= prif.mem.RegWr;
       prif.wb.MemtoReg <= prif.mem.MemtoReg;
@@ -84,7 +99,12 @@ module pipeline_reg(
     end 
     else if (dhit) begin
 /////////////////////     MEMWB STAGE    ///////////////////////////
-        prif.wb.npc    <= prif.mem.npc;
+      prif.wb.imemload <= prif.mem.imemload;  
+      prif.wb.npc    <= prif.mem.npc;
+      prif.wb.branchAddr <= prif.mem.branchAddr;
+        prif.wb.cur_imm    <= prif.mem.cur_imm;
+        prif.wb.lui_imm   <= prif.mem.lui_imm;
+        prif.wb.pc <= prif.mem.pc;
       //Control unit signals
         // prif.mem.MemWr <= 0;
         // prif.mem.MemtoReg <= 0;

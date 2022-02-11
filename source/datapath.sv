@@ -126,7 +126,8 @@ module datapath (
   assign dcif.imemaddr = pc;
 
 
-
+  assign prif.in_lui_imm = lui_imm;
+  assign prif.in_pc = pc;
 //input for pipeline
   assign   prif.in_imemload = dcif.imemload;
   //pc
