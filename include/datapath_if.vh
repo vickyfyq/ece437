@@ -12,23 +12,23 @@ interface datapath_cache_if;
   typedef struct packed {
     //Decode signals
     word_t imemload;
-    //logic zeroext, signext, lui; //ExtOp: zeroext, signext, lui 
     
     //Execute signals
-    word_t rdat1, rdat2, cur_imm, pc_p4, jumpAddr;
+    word_t rdat1, rdat2, cur_imm, npc;
     logic [1:0] RegDst; //RegDst: 0->rt, 1->rd, 2->r31
     logic ALUSrc; //ALUSrc: 0->regB, 1->imm
     aluop_t ALUOp; 
     regbits_t rt, rd;
     
     //Memory signals
-    word_t branchAddr, ALUout, npc;
-    logic MemWr, MemRead;
+    word_t branchAddr,jumpAddr, ALUout, npc;
+    logic MemWr ;
     logic beq, bne; // branch && zero flag : 
                   //0<pc+4, 1<- pc+4+ signext(imm16)<< 2
                   //1<- beq, 2<-bne
     logic jump, jreg , jal; //jump :  1<- {pc+4[31:28], addr,00 },2<-R[rs]
     logic zero;
+
     //Write back signals
     word_t dmemload;
     logic MemtoReg;//MemtoReg:0->aluout 1->dmemload
@@ -37,56 +37,70 @@ interface datapath_cache_if;
     regbits_t WrDest; // wsel
   } pipe_control;
 
-pipe_control id, ex, mem, wb;
+  typedef struct packed {
+    //mux
+    word_t ALUout;
+    word_t dmemload;
+    //control
+    logic MemtoReg;
+    logic RegWr; 
+    logic Halt;
+    //wsel
+    regbits_t WrDest;
 
-// datapath signals
-// Fetch
-word_t  if_pc_p4, if_imemload;
-// Decode
-    word_t id_imemload, id_pc_p4;
-    logic id_RegWr; 
-    logic[1:0] id_RegDst; //RegDst: 0->rt, 1->rd, 2->r31
-    logic id_zeroext, id_signext, id_lui; //ExtOp: zeroext, signext, lui 
-    logic id_ALUSrc; //ALUSrc: 0->regB, 1->imm
-    aluop_t id_ALUOp; 
-    logic id_MemWr, id_MemRead;
-    logic id_MemtoReg;//MemtoReg:0->aluout 1->dmemload
-    logic id_beq, id_bne; // branch && zero flag : 
-                  //0<pc+4, 1<- pc+4+ signext(imm16)<< 2
-                  //1<- beq, 2<-bne
-    logic id_jump, id_jreg , id_jal; //jump :  1<- {pc+4[31:28], addr,00 },2<-R[rs]
-    logic id_Halt;
+  } pipe_control_memwb;
+  
+  typedef struct packed {  
+    word_t rdat1, rdat2;
+    logic zero;
+    word_t branchAddr, jumpAddr, ALUout;
+    //WSEL
+    regbits_t WrDest;
+    
+    //control
+    logic MemWr ;
+    logic beq, bne; 
+    logic jump, jreg , jal; 
+    logic MemtoReg;
+    logic RegWr; 
+    logic Halt;
+    
+  } pipe_control_exmem;
 
-// Execute
-    word_t ex_pc_p4, ex_rdat1, ex_rdat2, ex_imemload, ex_cur_imm, ex_branchAddr, ex_ALUout, ex_jumpAddr;
-    logic ex_RegWr; 
-    logic[1:0] ex_RegDst; //RegDst: 0->rt, 1->rd, 2->r31
-    logic ex_ALUSrc; //ALUSrc: 0->regB, 1->imm
-    aluop_t ex_ALUOp; 
-    logic ex_MemWr, ex_MemRead;
-    logic ex_MemtoReg;//MemtoReg:0->aluout 1->dmemload
-    logic ex_beq, ex_bne; // branch && zero flag : 
-                  //0<pc+4, 1<- pc+4+ signext(imm16)<< 2
-                  //1<- beq, 2<-bne
-    logic ex_jump, ex_jreg , ex_jal; //jump :  1<- {pc+4[31:28], addr,00 },2<-R[rs]
-    logic ex_Halt;
-    logic ex_zero;
-// MEM
-    word_t mem_rdat2, mem_ALUout, mem_branchAddr, mem_jumpAddr, mem_rdat1, mem_dmemload;
-    logic mem_zero;
-    logic mem_RegWr; 
-    logic mem_MemWr, mem_MemRead;
-    logic mem_MemtoReg;//MemtoReg:0->aluout 1->dmemload
-    logic mem_beq, mem_bne; // branch && zero flag : 
-                  //0<pc+4, 1<- pc+4+ signmemt(imm16)<< 2
-                  //1<- beq, 2<-bne
-    logic mem_jump, mem_jreg , mem_jal; //jump :  1<- {pc+4[31:28], addr,00 },2<-R[rs]
-    logic mem_Halt;
-// Write back
-    word_t wb_dmemload, wb_rdat2;
-    logic wb_RegWr; 
-    logic wb_memtoReg;//wbtoReg:0->aluout 1->dwbload
-    logic wb_Halt;
+  typedef struct packed {
+    //Decode signals
+    word_t imemload;
+    
+    //Execute signals
+    word_t rdat1, rdat2, cur_imm, npc;
+    logic [1:0] RegDst; 
+    logic ALUSrc; 
+    aluop_t ALUOp; 
+    regbits_t rt, rd;
+    
+    //Memory signals
+    word_t branchAddr,jumpAddr, ALUout, npc;
+    logic MemWr ;
+    logic beq, bne; 
+    logic jump, jreg , jal; 
+    logic zero;
+
+    //Write back signals
+    word_t dmemload;
+    logic MemtoReg;
+    logic RegWr; 
+    logic Halt;
+  } pipe_control_idex;
+  
+  typedef struct packed {
+    //Decode signals
+    word_t imemload, npc;
+  } pipe_control_idex;
+
+pipe_control_memwb wb;
+pipe_control_exmem mem;
+pipe_control_idex ex;
+pipe_control_ifid id;
 
 
 endinterface
