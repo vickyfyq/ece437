@@ -13,6 +13,7 @@
 
 `include "register_file_if.vh"
 `include "alu_if.vh"
+`include "forward_unit_if.vh"
 // alu op, mips op, and instruction type
 `include "cpu_types_pkg.vh"
 
