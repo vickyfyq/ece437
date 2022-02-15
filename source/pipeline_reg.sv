@@ -110,6 +110,8 @@ prif.mem.pc <= prif.ex.pc;
         // prif.mem.MemWr <= 0;
         // prif.mem.MemtoReg <= 0;
         prif.mem <= '0;
+      
+      prif.wb.rdat2    <= prif.mem.rdat2;
       prif.wb.RegWr    <= prif.mem.RegWr;
       prif.wb.RegWr    <= prif.mem.RegWr;
       prif.wb.MemtoReg <= prif.mem.MemtoReg;
