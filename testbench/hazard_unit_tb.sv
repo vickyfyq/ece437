@@ -12,14 +12,16 @@ module hazard_unit_tb;
   hazard_unit DUT(huif);
 `else
   hazard_unit DUT (
+
     .\huif.mem (huif.mem),
+
     .\huif.flush (huif.flush)
   );
 `endif
 endmodule
 
-program test(control_unit_if huif);
-
+program test(hazard_unit_if huif);
+logic test_num;
 task set_inputs;
   input jump;
   input jal;
@@ -90,7 +92,7 @@ initial begin
     test_num += 1;
     set_inputs(0,0,0,0,1,1);
     #(PERIOD)
-    read_output(1);
+    read_output(0);
 
     $finish;
 end

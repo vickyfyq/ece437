@@ -6,12 +6,12 @@ module hazard_unit(
 );
     import cpu_types_pkg::*;
     always_comb begin
-        if ((huif.mem.beq && huif.mem.zero != 0) ||(huif.mem.bne && huif.mem.zero = 0)) //taken
-            huif.mem.flush = 1;
+        if ((huif.mem.beq && huif.mem.zero != 0) ||(huif.mem.bne && huif.mem.zero == 0)) //taken
+            huif.flush = 1;
         else if (huif.mem.jump || huif.mem.jreg || huif.mem.jal)    
-            huif.mem.flush = 1;
+            huif.flush = 1;
         else    
-            huif.mem.flush = 0;
+            huif.flush = 0;
     end
 
 endmodule
