@@ -12,12 +12,7 @@ module hazard_unit_tb;
   hazard_unit DUT(huif);
 `else
   hazard_unit DUT (
-    .\huif.jal (huif.jal ),
-    .\huif.jreg (huif.jreg ),
-    .\huif.jump (huif.jump ),
-    .\huif.bne (huif.bne ),
-    .\huif.beq (huif.beq ),
-    .\huif.zero (huif.zero),
+    .\huif.mem (huif.mem),
     .\huif.flush (huif.flush)
   );
 `endif
@@ -33,22 +28,22 @@ task set_inputs;
   input bne;
   input zero;
 begin
-  huif.jump = jump;
-  huif.jal = jal;
-  huif.jreg = jreg;
-  huif.beq = beq;
-  huif.bne = bne;
-  huif.zero = zero;
+  huif.mem.jump = jump;
+  huif.mem.jal = jal;
+  huif.mem.jreg = jreg;
+  huif.mem.beq = beq;
+  huif.mem.bne = bne;
+  huif.mem.zero = zero;
 end  
 endtask;
 
 task read_output;
   input expected;
 begin
-  assert(expected == huif.hazard)
+  assert(expected == huif.flush)
     $display("Correct output for test case %0d", test_num);
   else
-    $display("Incorrect output for test case %0d. Expected: %0d , Actual: %0d", test_num, expected, huif.hazard);
+    $display("Incorrect output for test case %0d. Expected: %0d , Actual: %0d", test_num, expected, huif.flush);
 end
 endtask
 
