@@ -27,10 +27,11 @@ module forward_unit_tb;
 `endif
 endmodule
 
-program test(control_unit_if fuif);
-
+program test(forward_unit_if fuif);
+integer test_num;
 task set_inputs;
-    input ex_rs, ex_rt, mem_WrDest, wb_WrDest, mem_MemtoReg, mem_RegWr, wb_RegWr, dhit;
+    input regbits_t ex_rs, ex_rt, mem_WrDest, wb_WrDest; 
+    input mem_MemtoReg, mem_RegWr, wb_RegWr, dhit;
 begin
     fuif.ex_rs        = ex_rs;
     fuif.ex_rt        = ex_rt;
@@ -44,14 +45,18 @@ end
 endtask;
 
 task read_output;
-  input ex_A, ex_B;
+  input [1:0] ex_A, ex_B;
 begin
-  assert(ex_A == fuif.forwardA && ex_B == fuif.forwardB)
+  assert(ex_A == fuif.forwardA)
     $display("Correct output for test case %0d", test_num);
   else
     $display("Incorrect output for test case %0d. Expected fwdA: %0d  , Actual fwdA: %0d", test_num, ex_A, fuif.forwardA);
+  
+  assert(ex_B == fuif.forwardB)
+    $display("Correct output for test case %0d", test_num);
+  else
     $display("Incorrect output for test case %0d. Expected fwdB: %0d  , Actual fwdB: %0d", test_num, ex_B, fuif.forwardB);
-    end
+end
 endtask
 
 parameter PERIOD = 10;
@@ -84,22 +89,22 @@ initial begin
     test_num += 1;
     set_inputs('0,'0,'0,'0,0,0,0,0);
     #(PERIOD)
-    read_output(2'b00,'0);
+    read_output('0,2'b00);
 
     test_num += 1;
     set_inputs('0,5'd3,5'd3,'0,1,1,0,1);
     #(PERIOD)
-    read_output(2'b11,'0);
+    read_output('0, 2'b11);
 
     test_num += 1;
     set_inputs('0,5'd4,5'd4,'0,0,1,0,0);
     #(PERIOD)
-    read_output(2'b10,'0);
+    read_output('0, 2'b10);
 
     test_num += 1;
     set_inputs('0,5'd5,'0,5'd5,0,0,1,0);
     #(PERIOD)
-    read_output(2'b01,'0);
+    read_output('0, 2'b01);
 
 
     $finish;

@@ -7,7 +7,7 @@
 interface forward_unit_if;
     // import types
     import cpu_types_pkg::*;
-    regbits ex_rs, ex_rt, mem_WrDest, wb_WrDest;
+    regbits_t ex_rs, ex_rt, mem_WrDest, wb_WrDest;
     logic mem_RegWr, wb_RegWr, dhit, mem_MemtoReg;
     logic [1:0] forwardA, forwardB;
 
