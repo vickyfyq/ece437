@@ -13,7 +13,8 @@
 
 `include "register_file_if.vh"
 `include "alu_if.vh"
-//`include "forward_unit_if.vh"
+`include "forward_unit_if.vh"
+`include "hazard_unit_if.vh"
 // alu op, mips op, and instruction type
 `include "cpu_types_pkg.vh"
 
@@ -30,6 +31,8 @@ module datapath (
   control_unit_if cuif();
   request_unit_if ruif();
   register_file_if rfif();
+  forward_unit_if fuif();
+  hazard_unit_if huif();
   alu_if aluif();
   
   //DUT
@@ -38,6 +41,8 @@ module datapath (
   register_file RF (CLK, nRST, rfif);
   alu ALU (aluif);
   pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit, prif);
+  hazard_unit  HU (huif);
+  forward_unit FU (fuif);
 
   // pc initprif
   word_t pc, npc, pc_p4;
@@ -72,10 +77,31 @@ module datapath (
   //extop does not need to go throught reg
   assign cur_imm = cuif.zeroext ? zeroext_imm : (cuif.lui ? lui_imm : cuif.signext ? signext_imm : 32'h0);
 
-  assign aluif.aluop = prif.ex.ALUOp;
-  assign aluif.portA = prif.ex.rdat1;
-  assign aluif.portB = prif.ex.ALUSrc ? prif.ex.cur_imm : prif.ex.rdat2;
+  word_t aluPortA, aluPortB;
 
+  assign aluif.aluop = prif.ex.ALUOp;
+  //assign aluif.portA = prif.ex.rdat1;
+  //assign aluif.portB = prif.ex.ALUSrc ? prif.ex.cur_imm : prif.ex.rdat2;
+  assign aluif.portA = aluPortA;
+  assign aluif.portB = prif.ex.ALUSrc ? prif.ex.cur_imm : aluPortB;
+
+  // Forwarding muxes
+  always_comb begin
+    casez (fuif.forwardA)
+      2'b11 : aluPortA = dcif.dmemload;
+      2'b10 : aluPortA = prif.mem.ALUout;
+      2'b01 : aluPortA = prif.wb.ALUout;
+      2'b00 : aluPortA = prif.ex.rdat1;
+    endcase
+    casez (fuif.forwardB)
+      2'b11 : aluPortB = dcif.dmemload;
+      2'b10 : aluPortB = prif.mem.ALUout;
+      2'b01 : aluPortB = prif.wb.ALUout;
+      2'b00 : aluPortB = prif.ex.rdat2;
+    endcase
+  end
+
+  assign prif.in_aluPortB = aluPortB;
 
   word_t branchAddr, jumpAddr;
   assign jumpAddr = {prif.ex.npc[31:28], exjtype.addr,2'b00};
@@ -102,6 +128,25 @@ module datapath (
     end
 
   end
+
+  //Hazard Unit
+  assign huif.mem.jal = prif.mem.jal;
+  assign huif.mem.jreg = prif.mem.jreg;
+  assign huif.mem.jump = prif.mem.jump;
+  assign huif.mem.bne = prif.mem.bne;
+  assign huif.mem.beq = prif.mem.beq;
+  assign huif.mem.zero = prif.mem.zero;
+  assign prif.flush = huif.flush;
+
+  //Forward Unit
+  assign fuif.ex_rs = prif.ex.imemload[25:21];
+  assign fuif.ex_rt = prif.ex.imemload[20:16];
+  assign fuif.mem_WrDest = prif.mem.WrDest;
+  assign fuif.mem_RegWr = prif.mem.RegWr;
+  assign fuif.mem_MemtoReg = prif.mem.MemtoReg;
+  assign fuif.wb_WrDest = prif.wb.WrDest;
+  assign fuif.wb_RegWr = prif.wb.RegWr;
+  assign fuif.dhit = dcif.dhit;
 
   //halt register
   logic nhalt,halt;

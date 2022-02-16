@@ -105,6 +105,8 @@ pipe_control_exmem mem;
 pipe_control_idex ex;
 pipe_control_ifid id;
 
+logic flush;
+
 logic wb_enable;
 word_t in_imemload, in_npc, in_pc;
 logic[1:0] in_RegDst;
@@ -119,7 +121,7 @@ logic in_jal;
 logic in_RegWr;
 logic in_MemtoReg;
 logic in_Halt;
-word_t in_rdat1, in_rdat2, in_lui_imm,in_cur_imm,in_jumpAddr,in_branchAddr;
+word_t in_rdat1, in_rdat2, in_lui_imm,in_cur_imm,in_jumpAddr,in_branchAddr, in_aluPortB;
 regbits_t in_rt, in_rd;
 word_t in_ALUout;
 logic in_zero;
