@@ -28,7 +28,7 @@ module forward_unit_tb;
 endmodule
 
 program test(forward_unit_if fuif);
-integer test_num;
+string test_num;
 task set_inputs;
     input regbits_t ex_rs, ex_rt, mem_WrDest, wb_WrDest; 
     input mem_MemtoReg, mem_RegWr, wb_RegWr, dhit;
