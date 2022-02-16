@@ -48,12 +48,12 @@ task read_output;
   input [1:0] ex_A, ex_B;
 begin
   assert(ex_A == fuif.forwardA)
-    $display("Correct output for test case %0d", test_num);
+    $display("Correct output for test case %s", test_num);
   else
     $display("Incorrect output for test case %0d. Expected fwdA: %0d  , Actual fwdA: %0d", test_num, ex_A, fuif.forwardA);
   
   assert(ex_B == fuif.forwardB)
-    $display("Correct output for test case %0d", test_num);
+    $display("Correct output for test case %s", test_num);
   else
     $display("Incorrect output for test case %0d. Expected fwdB: %0d  , Actual fwdB: %0d", test_num, ex_B, fuif.forwardB);
 end

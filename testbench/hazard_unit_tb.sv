@@ -12,9 +12,7 @@ module hazard_unit_tb;
   hazard_unit DUT(huif);
 `else
   hazard_unit DUT (
-
     .\huif.mem (huif.mem),
-
     .\huif.flush (huif.flush)
   );
 `endif
