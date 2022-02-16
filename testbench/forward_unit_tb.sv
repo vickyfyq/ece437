@@ -61,47 +61,48 @@ endtask
 
 parameter PERIOD = 10;
 initial begin
-    //set_inputs(ex_rs, ex_rt, mem_WrDest, wb_WrDest, mem_MemtoReg, mem_RegWr, wb_RegWr, dhit)
-    test_num = 0;
+    //set_inputs(ex_rs, ex_rt, mem_WrDest, wb_WrDest, 
+  //mem_MemtoReg, mem_RegWr, wb_RegWr, dhit)
+    test_num = "";
 
     //forward A rtype
-    test_num += 1;
+    test_num ="A 00";
     set_inputs('0,'0,'0,'0,0,0,0,0);
     #(PERIOD)
-    read_output(2'b00,'0);
+    read_output(2'b00,2'b00);
 
-    test_num += 1;
+    test_num ="A 11";
     set_inputs(5'd3,'0,5'd3,'0,1,1,0,1);
     #(PERIOD)
-    read_output(2'b11,'0);
+    read_output(2'b11,2'b00);
 
-    test_num += 1;
+    test_num ="A 10";
     set_inputs(5'd4,'0,5'd4,'0,0,1,0,0);
     #(PERIOD)
-    read_output(2'b10,'0);
+    read_output(2'b10,2'b00);
 
-    test_num += 1;
+    test_num ="A 01";
     set_inputs(5'd5,'0,'0,5'd5,0,0,1,0);
     #(PERIOD)
-    read_output(2'b01,'0);
+    read_output(2'b01,2'b00);
 
     //forward B itype
-    test_num += 1;
+    test_num ="B 00";
     set_inputs('0,'0,'0,'0,0,0,0,0);
     #(PERIOD)
     read_output('0,2'b00);
 
-    test_num += 1;
+    test_num ="B 11";
     set_inputs('0,5'd3,5'd3,'0,1,1,0,1);
     #(PERIOD)
     read_output('0, 2'b11);
 
-    test_num += 1;
+    test_num ="B 10";
     set_inputs('0,5'd4,5'd4,'0,0,1,0,0);
     #(PERIOD)
     read_output('0, 2'b10);
 
-    test_num += 1;
+    test_num ="B 01";
     set_inputs('0,5'd5,'0,5'd5,0,0,1,0);
     #(PERIOD)
     read_output('0, 2'b01);
