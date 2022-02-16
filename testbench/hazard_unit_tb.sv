@@ -19,7 +19,7 @@ module hazard_unit_tb;
 endmodule
 
 program test(hazard_unit_if huif);
-logic test_num;
+integer test_num;
 task set_inputs;
   input jump;
   input jal;
