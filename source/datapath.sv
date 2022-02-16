@@ -10,10 +10,11 @@
 `include "datapath_cache_if.vh"
 `include "pipeline_reg_if.vh"
 `include "control_unit_if.vh"
-
+`include "forward_unit_if.vh"
+`include "hazard_unit_if.vh"
 `include "register_file_if.vh"
 `include "alu_if.vh"
-//`include "forward_unit_if.vh"
+
 // alu op, mips op, and instruction type
 `include "cpu_types_pkg.vh"
 
@@ -24,26 +25,28 @@ module datapath (
   // import types
   import cpu_types_pkg::*;
 
-    // pc init
+  // pc init
   parameter PC_INIT = 0;
-  pipeline_reg_if prif();
-  control_unit_if cuif();
-  request_unit_if ruif();
+  pipeline_reg_if  prif();
+  control_unit_if  cuif();
+  hazard_unit_if   huif();
+  forward_unit_if  fuif();
   register_file_if rfif();
-  alu_if aluif();
+  alu_if           aluif();
   
   //DUT
   control_unit CU (cuif);
-  request_unit RU (CLK, nRST, ruif);
   register_file RF (CLK, nRST, rfif);
   alu ALU (aluif);
-  pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit, prif);
+  pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit, huif.flush ,prif);
+  forward_unit FU fuif(fuif);
+  hazard_unit HU huif(huif);
 
   // pc initprif
   word_t pc, npc, pc_p4;
   assign pc_p4 = pc+4;
   i_t iditype;
-  r_t idrtype, rtype;
+  r_t idrtype, exrtype ,rtype;
   j_t exjtype;
   assign rtype = dcif.imemload; //for cpu tracker
 
@@ -111,8 +114,8 @@ module datapath (
     if(!nRST) halt <= 0;
     else halt <= nhalt;
   end
-  //pc register
 
+  //pc register
   always_ff@ (posedge CLK, negedge nRST) begin
     if(!nRST)  pc<= 32'b0;
     else if(dcif.ihit&!dcif.dhit) pc <= npc;
@@ -127,11 +130,30 @@ module datapath (
   assign dcif.dmemaddr = prif.mem.ALUout;
   assign dcif.imemaddr = pc;
 
+/////////////////// hazard unit ////////////////////////
+  assign huif.mem.jump = prif.mem.jump;
+  assign huif.mem.jal  = prif.mem.jal;
+  assign huif.mem.jreg = prif.mem.jreg;
+  assign huif.mem.beq  = prif.mem.beq;
+  assign huif.mem.bne  = prif.mem.bne;
+  assign huif.mem.zero = prif.mem.zero;
 
-  assign prif.in_lui_imm = lui_imm;
-  assign prif.in_pc = pc;
-//input for pipeline
-  assign   prif.in_imemload = dcif.imemload;
+
+/////////////////// forward unit ////////////////////////
+assign  fuif.ex_rs        = exrtype.rs;
+assign  fuif.ex_rt        = exrtype.rt;
+assign  fuif.mem_WrDest   = prif.mem.WrDest;
+assign  fuif.wb_WrDest    = prif.wb.WrDest;
+assign  fuif.mem_MemtoReg = prif.mem.MemtoReg;
+assign  fuif.mem_RegWr    = prif.mem.RegWr;
+assign  fuif.wb_RegWr     = prif.wb.RegWr;
+assign  fuif.dhit         = dcif.dhit;
+
+  
+///////////////  input for pipeline ///////////////////
+    assign   prif.in_imemload = dcif.imemload;
+    assign prif.in_lui_imm = lui_imm;
+    assign prif.in_pc = pc;
   //pc
     assign   prif.in_npc      = npc;
   
@@ -156,8 +178,7 @@ module datapath (
   //rt rd for WrDest
     assign   prif.in_rt       = iditype.rt;
     assign   prif.in_rd       = idrtype.rd;
-  
-    //alu
+  //alu
     assign   prif.in_ALUout   = aluif.outport;
     assign   prif.in_zero     = aluif.zero;
     assign   prif.in_branchAddr = branchAddr;
