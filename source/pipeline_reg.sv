@@ -2,7 +2,7 @@
 `include "cpu_types_pkg.vh"
 
 module pipeline_reg(
-    input logic CLK, nRST, ihit, dhit,flush
+    input logic CLK, nRST, ihit, dhit,
     pipeline_reg_if prif
 );
 assign wb_enable = ihit | dhit;
@@ -202,7 +202,7 @@ assign wb_enable = ihit |dhit;
       prif.wb.WrDest     <= prif.mem.WrDest;
 
     end
-    else if (flush) begin
+    else if (prif.flush) begin
       prif.id   <= '0; //flush wrong branch target
       prif.ex   <= '0;
     end

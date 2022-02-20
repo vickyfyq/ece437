@@ -33,15 +33,13 @@ module datapath (
   hazard_unit_if   huif();
   forward_unit_if  fuif();
   register_file_if rfif();
-  forward_unit_if fuif();
-  hazard_unit_if huif();
   alu_if aluif();
   
   //DUT
   control_unit CU (cuif);
   register_file RF (CLK, nRST, rfif);
   alu ALU (aluif);
-  pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit, prif);
+  pipeline_reg PR (CLK,nRST,dcif.ihit, dcif.dhit,  prif);
   hazard_unit  HU (huif);
   forward_unit FU (fuif);
 
@@ -172,7 +170,7 @@ module datapath (
   assign dcif.dmemstore = prif.mem.rdat2;
   assign dcif.dmemaddr = prif.mem.ALUout;
   assign dcif.imemaddr = pc;
-
+/*
 /////////////////// hazard unit ////////////////////////
   assign huif.mem.jump = prif.mem.jump;
   assign huif.mem.jal  = prif.mem.jal;
@@ -191,7 +189,7 @@ assign  fuif.mem_MemtoReg = prif.mem.MemtoReg;
 assign  fuif.mem_RegWr    = prif.mem.RegWr;
 assign  fuif.wb_RegWr     = prif.wb.RegWr;
 assign  fuif.dhit         = dcif.dhit;
-
+*/
   
 ///////////////  input for pipeline ///////////////////
     assign   prif.in_imemload = dcif.imemload;
