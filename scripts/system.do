@@ -50,14 +50,16 @@ add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/prif/mem.AL
 add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/prif/wb.ALUout
 add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/rfif/wdat
 add wave -noupdate -expand -group {beef issue} {/system_tb/DUT/CPU/DP/RF/registers[10]}
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.imemload
 add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.imemload
+add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.imemload
+add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.imemload
+add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.imemload
 add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.npc
 add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.npc
 add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.npc
 add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.npc
-add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/wb
-add wave -noupdate -expand -group pipeline -expand /system_tb/DUT/CPU/DP/prif/mem
+add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/wb
+add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/mem
 add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/ex
 add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/id
 add wave -noupdate -expand -group pipeline -group pipeline_input /system_tb/DUT/CPU/DP/prif/in_imemload
@@ -114,8 +116,20 @@ add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/forwardA
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/forwardB
 add wave -noupdate -expand -group hzd /system_tb/DUT/CPU/DP/huif/flush
 add wave -noupdate -expand -group hzd /system_tb/DUT/CPU/DP/huif/mem
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/halt
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/ihit
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemREN
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemload
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemaddr
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dhit
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemREN
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemWEN
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/flushed
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemload
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemstore
+add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemaddr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4819380 ps} 0}
+WaveRestoreCursors {{Cursor 1} {628611 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -131,4 +145,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {4659900 ps} {5017900 ps}
+WaveRestoreZoom {393800 ps} {751800 ps}

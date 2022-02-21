@@ -89,13 +89,13 @@ module datapath (
     casez (fuif.forwardA)
       2'b11 : aluPortA = dcif.dmemload;
       2'b10 : aluPortA = prif.mem.ALUout;
-      2'b01 : aluPortA = prif.wb.ALUout;
+      2'b01 : aluPortA = rfif.wdat; //Wrong
       2'b00 : aluPortA = prif.ex.rdat1;
     endcase
     casez (fuif.forwardB)
       2'b11 : aluPortB = dcif.dmemload;
       2'b10 : aluPortB = prif.mem.ALUout;
-      2'b01 : aluPortB = prif.wb.ALUout;
+      2'b01 : aluPortB = rfif.wdat; //Wrong
       2'b00 : aluPortB = prif.ex.rdat2;
     endcase
   end
