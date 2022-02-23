@@ -11,20 +11,20 @@ module forward_unit(
         fuif.forwardB = 0;
 //mem ex
         //dmemload
-        if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rs && fuif.mem_MemtoReg && fuif.dhit)
-            fuif.forwardA = 2'b11;
+        //if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rs && fuif.mem_MemtoReg && fuif.dhit)
+        //    fuif.forwardA = 2'b11;
         //mem.aluout
-        else if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rs && !fuif.mem_MemtoReg)
+        if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rs && !fuif.mem_MemtoReg)
             fuif.forwardA = 2'b10;
         //wb.aluout
         else if(fuif.wb_RegWr && fuif.wb_WrDest != 0 && fuif.wb_WrDest == fuif.ex_rs)
             fuif.forwardA = 2'b01;
 //mem wb
         //dmemload
-        if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rt && fuif.mem_MemtoReg && fuif.dhit)
-            fuif.forwardB = 2'b11;
+        //if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rt && fuif.mem_MemtoReg && fuif.dhit)
+        //    fuif.forwardB = 2'b11;
         //mem.aluout
-        else if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rt && !fuif.mem_MemtoReg)
+        if(fuif.mem_RegWr && fuif.mem_WrDest != 0 && fuif.mem_WrDest == fuif.ex_rt && !fuif.mem_MemtoReg)
             fuif.forwardB = 2'b10;
         //wb.aluout
         else if(fuif.wb_RegWr && fuif.wb_WrDest != 0 && fuif.wb_WrDest == fuif.ex_rt)

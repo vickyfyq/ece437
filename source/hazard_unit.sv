@@ -12,6 +12,11 @@ module hazard_unit(
             huif.flush = 1;
         else    
             huif.flush = 0;
+        
+        if(huif.ex.MemtoReg && (huif.ex.rt == huif.id.rs || huif.ex.rt == huif.id.rt))
+            huif.stall = 1;
+        else
+            huif.stall = 0;
     end
 
 endmodule

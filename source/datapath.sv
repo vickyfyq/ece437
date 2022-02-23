@@ -56,6 +56,7 @@ module datapath (
   assign idrtype = prif.id.imemload;
   assign iditype = prif.id.imemload;
   assign exjtype = prif.ex.imemload;
+  assign exrtype = prif.ex.imemload;
 
   regbits_t WrDest;
   //register file connections
@@ -87,16 +88,16 @@ module datapath (
   // Forwarding muxes
   always_comb begin
     casez (fuif.forwardA)
-      2'b11 : aluPortA = dcif.dmemload;
+      //2'b11 : aluPortA = dcif.dmemload;
       2'b10 : aluPortA = prif.mem.ALUout;
-      2'b01 : aluPortA = rfif.wdat; //Wrong
-      2'b00 : aluPortA = prif.ex.rdat1;
+      2'b01 : aluPortA = rfif.wdat; 
+      default : aluPortA = prif.ex.rdat1;
     endcase
     casez (fuif.forwardB)
-      2'b11 : aluPortB = dcif.dmemload;
+      //2'b11 : aluPortB = dcif.dmemload;
       2'b10 : aluPortB = prif.mem.ALUout;
-      2'b01 : aluPortB = rfif.wdat; //Wrong
-      2'b00 : aluPortB = prif.ex.rdat2;
+      2'b01 : aluPortB = rfif.wdat; 
+      default : aluPortB = prif.ex.rdat2;
     endcase
   end
 
@@ -108,6 +109,8 @@ module datapath (
   //branch jump
   always_comb begin
     npc = pc_p4;
+    if(huif.stall)
+      npc = pc;
     ///////////////////////////jump///////////////////////////////
     if (prif.mem.jump) begin
       npc = prif.mem.jumpAddr;
@@ -135,7 +138,12 @@ module datapath (
   assign huif.mem.bne = prif.mem.bne;
   assign huif.mem.beq = prif.mem.beq;
   assign huif.mem.zero = prif.mem.zero;
+  assign huif.id.rs = idrtype.rs;
+  assign huif.id.rt = idrtype.rt;
+  assign huif.ex.rt = exrtype.rt;
+  assign huif.ex.MemtoReg = prif.ex.MemtoReg;
   assign prif.flush = huif.flush;
+  assign prif.stall = huif.stall;
 
   //Forward Unit
   assign fuif.ex_rs = prif.ex.imemload[25:21];
@@ -146,6 +154,8 @@ module datapath (
   assign fuif.wb_WrDest = prif.wb.WrDest;
   assign fuif.wb_RegWr = prif.wb.RegWr;
   assign fuif.dhit = dcif.dhit;
+  assign prif.forwardA = fuif.forwardA;
+  assign prif.forwardB = fuif.forwardB;
 
   //halt register
   logic nhalt,halt;

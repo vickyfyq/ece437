@@ -171,7 +171,7 @@ else begin
         cuif.RegWr = 1;
     end
     SLTIU :begin
-        cuif.ALUOp = ALU_SLT ;
+        cuif.ALUOp = ALU_SLTU ;
         cuif.ALUSrc = 1; 
         cuif.signext = 1;
         cuif.RegWr = 1;

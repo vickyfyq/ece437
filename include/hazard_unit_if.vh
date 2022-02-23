@@ -11,14 +11,28 @@ interface hazard_unit_if;
     logic jal,jreg,jump;
     logic bne, beq, zero;
     } hazard;
-    logic flush;
+
+    typedef struct packed {
+        regbits_t rt;
+        logic MemtoReg;
+    } ex_hazard;
+
+    typedef struct packed {
+        regbits_t rs, rt;
+    } id_hazard;
+
+    logic flush, stall;
     hazard mem;
+    ex_hazard ex;
+    id_hazard id;
 
     modport hzd(
-        input mem, output flush
+        input mem, ex, id,
+        output flush, stall
     );
     modport tb(
-        output mem, input flush
+        output mem, ex, id,
+        input flush, stall
     );
 
 

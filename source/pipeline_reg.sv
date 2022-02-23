@@ -40,6 +40,52 @@ assign wb_enable = ihit |dhit;
       //wsel
       prif.wb.WrDest   <= prif.mem.WrDest;
     end
+    else if(prif.stall && (ihit || dhit)) begin
+      prif.ex <= '0;
+      /////////////////////     EXMEM STAGE    ///////////////////////////
+      prif.mem.npc    <= prif.ex.npc;
+      prif.mem.imemload <= prif.ex.imemload;
+      prif.mem.pc <= prif.ex.pc;
+      prif.mem.cur_imm    <= prif.ex.cur_imm;
+      prif.mem.lui_imm   <= prif.ex.lui_imm;
+      //Control unit signals
+      prif.mem.MemWr    <= prif.ex.MemWr;
+      prif.mem.beq      <= prif.ex.beq;
+      prif.mem.bne      <= prif.ex.bne;
+      prif.mem.jump     <= prif.ex.jump;
+      prif.mem.jreg     <= prif.ex.jreg;
+      prif.mem.jal      <= prif.ex.jal;
+      prif.mem.RegWr    <= prif.ex.RegWr;
+      prif.mem.MemtoReg <= prif.ex.MemtoReg;
+      prif.mem.Halt     <= prif.ex.Halt;
+      //alu
+      prif.mem.rdat2    <= prif.in_aluPortB;
+      prif.mem.ALUout   <= prif.in_ALUout;
+      prif.mem.zero     <= prif.in_zero;
+      prif.mem.branchAddr <= prif.in_branchAddr;
+      prif.mem.jumpAddr <= prif.in_jumpAddr;
+      prif.mem.rdat1    <= prif.ex.rdat1;
+      //write back register
+      prif.mem.WrDest   <= prif.in_WrDest;
+      /////////////////////     MEMWB STAGE    ///////////////////////////
+      prif.wb.npc        <= prif.mem.npc;
+      prif.wb.imemload   <= prif.mem.imemload;
+      prif.wb.branchAddr <= prif.mem.branchAddr;
+      prif.wb.pc         <= prif.mem.pc;
+      prif.wb.cur_imm    <= prif.mem.cur_imm;
+      prif.wb.lui_imm    <= prif.mem.lui_imm;
+      prif.wb.rdat2      <= prif.mem.rdat2;
+      //Control unit signals
+      prif.wb.RegWr      <= prif.mem.RegWr;
+      prif.wb.MemtoReg   <= prif.mem.MemtoReg;
+      prif.wb.Halt       <= prif.mem.Halt;
+      prif.wb.jal        <= prif.mem.jal;
+      //wdat
+      prif.wb.ALUout     <= prif.mem.ALUout;
+      prif.wb.dmemload   <= prif.in_dmemload;
+      //wsel
+      prif.wb.WrDest     <= prif.mem.WrDest;
+    end
     else if(ihit & !dhit)begin //stall when instr not ready
 /////////////////////   IFID STAGE    ///////////////////////////
       //instruction

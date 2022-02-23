@@ -18,13 +18,13 @@ add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jump
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jreg
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/jal
 add wave -noupdate -group {ctrl unit} /system_tb/DUT/CPU/DP/cuif/Halt
-add wave -noupdate -group {register file} -expand /system_tb/DUT/CPU/DP/RF/registers
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/WEN
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/wsel
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel1
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel2
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat1
-add wave -noupdate -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat2
+add wave -noupdate -expand -group {register file} -expand /system_tb/DUT/CPU/DP/RF/registers
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/WEN
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/wsel
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel1
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rsel2
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat1
+add wave -noupdate -expand -group {register file} /system_tb/DUT/CPU/DP/rfif/rdat2
 add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/aluop
 add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/portA
 add wave -noupdate -expand -group ALU /system_tb/DUT/CPU/DP/aluif/portB
@@ -45,19 +45,19 @@ add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/flushed
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemload
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemstore
 add wave -noupdate -group dp_cache /system_tb/DUT/CPU/DP/dcif/dmemaddr
-add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/aluif/outport
-add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/prif/mem.ALUout
-add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/prif/wb.ALUout
-add wave -noupdate -expand -group {beef issue} /system_tb/DUT/CPU/DP/rfif/wdat
-add wave -noupdate -expand -group {beef issue} {/system_tb/DUT/CPU/DP/RF/registers[10]}
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.imemload
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.imemload
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.imemload
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.imemload
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.npc
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.npc
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.npc
-add wave -noupdate -expand -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.npc
+add wave -noupdate -group {beef issue} /system_tb/DUT/CPU/DP/aluif/outport
+add wave -noupdate -group {beef issue} /system_tb/DUT/CPU/DP/prif/mem.ALUout
+add wave -noupdate -group {beef issue} /system_tb/DUT/CPU/DP/prif/wb.ALUout
+add wave -noupdate -group {beef issue} /system_tb/DUT/CPU/DP/rfif/wdat
+add wave -noupdate -group {beef issue} {/system_tb/DUT/CPU/DP/RF/registers[10]}
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.imemload
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.imemload
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.imemload
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.imemload
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/wb.npc
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/mem.npc
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/ex.npc
+add wave -noupdate -group {beef issue} -expand -group npcs /system_tb/DUT/CPU/DP/prif/id.npc
 add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/wb
 add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/mem
 add wave -noupdate -expand -group pipeline /system_tb/DUT/CPU/DP/prif/ex
@@ -104,6 +104,8 @@ add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/branchAddr
 add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/jumpAddr
 add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/nhalt
 add wave -noupdate -expand -group datapath /system_tb/DUT/CPU/DP/halt
+add wave -noupdate /system_tb/DUT/CPU/DP/prif/forwardA
+add wave -noupdate /system_tb/DUT/CPU/DP/prif/forwardB
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/ex_rs
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/ex_rt
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/mem_WrDest
@@ -114,22 +116,13 @@ add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/dhit
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/mem_MemtoReg
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/forwardA
 add wave -noupdate -expand -group fwd /system_tb/DUT/CPU/DP/fuif/forwardB
-add wave -noupdate -expand -group hzd /system_tb/DUT/CPU/DP/huif/flush
-add wave -noupdate -expand -group hzd /system_tb/DUT/CPU/DP/huif/mem
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/halt
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/ihit
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemREN
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemload
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/imemaddr
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dhit
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemREN
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemWEN
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/flushed
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemload
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemstore
-add wave -noupdate -expand -group dcif /system_tb/DUT/CPU/dcif/dmemaddr
+add wave -noupdate -expand -group {hazard unit} /system_tb/DUT/CPU/DP/huif/flush
+add wave -noupdate -expand -group {hazard unit} /system_tb/DUT/CPU/DP/huif/stall
+add wave -noupdate -expand -group {hazard unit} /system_tb/DUT/CPU/DP/huif/mem
+add wave -noupdate -expand -group {hazard unit} /system_tb/DUT/CPU/DP/huif/ex
+add wave -noupdate -expand -group {hazard unit} /system_tb/DUT/CPU/DP/huif/id
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {628611 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1459773 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -145,4 +138,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {393800 ps} {751800 ps}
+WaveRestoreZoom {1396200 ps} {1754200 ps}

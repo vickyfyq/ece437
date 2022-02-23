@@ -105,7 +105,8 @@ pipe_control_exmem mem;
 pipe_control_idex ex;
 pipe_control_ifid id;
 
-logic flush;
+logic flush, stall;
+logic [1:0] forwardA, forwardB;
 
 logic wb_enable;
 word_t in_imemload, in_npc, in_pc;
