@@ -12,7 +12,7 @@ sw  $5, 0($3)
 j   end
 branch:
 ori $5, $0, 0x123
-nop
+#nop
 sw  $5, 0($3)
 
 end:

@@ -16,7 +16,7 @@ assign wb_enable = ihit |dhit;
       prif.mem  <= '0;
       prif.wb   <= '0;
     end
-    else if(prif.flush) begin
+    else if((prif.flush || prif.mem.Halt) && (ihit || dhit)) begin
       prif.id <= '0;
       prif.ex <= '0;
       prif.mem <= '0;
@@ -201,10 +201,10 @@ assign wb_enable = ihit |dhit;
       //wsel  
       prif.wb.WrDest     <= prif.mem.WrDest;
 
-    end
+    end/*
     else if (prif.flush) begin
       prif.id   <= '0; //flush wrong branch target
       prif.ex   <= '0;
-    end
+    end*/
   end
 endmodule
