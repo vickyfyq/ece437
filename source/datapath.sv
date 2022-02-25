@@ -109,7 +109,7 @@ module datapath (
   //branch jump
   always_comb begin
     npc = pc_p4;
-    if(huif.stall)
+    if(huif.stall) 
       npc = pc;
     ///////////////////////////jump///////////////////////////////
     if (prif.mem.jump) begin
@@ -180,26 +180,7 @@ module datapath (
   assign dcif.dmemstore = prif.mem.rdat2;
   assign dcif.dmemaddr = prif.mem.ALUout;
   assign dcif.imemaddr = pc;
-/*
-/////////////////// hazard unit ////////////////////////
-  assign huif.mem.jump = prif.mem.jump;
-  assign huif.mem.jal  = prif.mem.jal;
-  assign huif.mem.jreg = prif.mem.jreg;
-  assign huif.mem.beq  = prif.mem.beq;
-  assign huif.mem.bne  = prif.mem.bne;
-  assign huif.mem.zero = prif.mem.zero;
 
-
-/////////////////// forward unit ////////////////////////
-assign  fuif.ex_rs        = exrtype.rs;
-assign  fuif.ex_rt        = exrtype.rt;
-assign  fuif.mem_WrDest   = prif.mem.WrDest;
-assign  fuif.wb_WrDest    = prif.wb.WrDest;
-assign  fuif.mem_MemtoReg = prif.mem.MemtoReg;
-assign  fuif.mem_RegWr    = prif.mem.RegWr;
-assign  fuif.wb_RegWr     = prif.wb.RegWr;
-assign  fuif.dhit         = dcif.dhit;
-*/
   
 ///////////////  input for pipeline ///////////////////
     assign   prif.in_imemload = dcif.imemload;
