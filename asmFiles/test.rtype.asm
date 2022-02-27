@@ -24,10 +24,6 @@
   ori   $14,$0,5
   srlv  $12,$14,$1
   nor   $13,$1,$2
-  slt   $15,$1,$2
-  slti   $16,$1,2
-  sltu   $17,$1,$2
-  sltiu   $18,$1,2
 # Store them to verify the results
   sw    $13,0($22)
   sw    $3,0($21)

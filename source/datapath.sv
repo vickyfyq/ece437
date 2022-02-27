@@ -159,11 +159,11 @@ module datapath (
 
   //halt register
   logic nhalt,halt;
-  assign nhalt = prif.wb.Halt;
+  assign nhalt = prif.mem.Halt;
   
   always_ff@ (posedge CLK, negedge nRST) begin
     if(!nRST) halt <= 0;
-    else halt <= nhalt;
+    else halt <= nhalt | halt;
   end
 
   //pc register
