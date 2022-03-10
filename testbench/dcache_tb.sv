@@ -43,10 +43,10 @@ module dcache_tb;
 
 endmodule
 
-program test(logic CLK, logic nRST, caches_if cif, datapath_cache_if dcif);
-
+program test(input logic CLK, output logic nRST, caches_if cif, datapath_cache_if dcif);
+int test_num;
 import cpu_types_pkg::*;
-
+/*
 task reset_dut;
 begin
     nRST = 1;
@@ -57,6 +57,7 @@ begin
     nRST = 1;
     @(posedge CLK);
 end
+endtask*/
 
 task read_outputs;
 input word_t dmemload;
@@ -94,11 +95,10 @@ begin
         $display("Correct output for test case %0d", test_num);
     
 end
+endtask
 
 initial begin
-
-  int testNum;
-
+  test_num = 0;
   nRST = 1;
   dcif.imemaddr = '0;
   dcif.halt = 0;
@@ -117,9 +117,18 @@ initial begin
   cif.iwait = 1;
   cif.iload = 0;
 
-  reset_dut();
+  //reset_dut();
+  nRST = 1;
+  @(posedge CLK);
+  nRST = 0;
+  @(posedge CLK);
+  @(posedge CLK);
+  nRST = 1;
+  @(posedge CLK);
 
   //load from 0x40 --- MISS
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemaddr = {30'h40, 2'b00};
   dcache_tb.cif.dwait = 0;
@@ -133,6 +142,8 @@ initial begin
   read_outputs(32'h12345678, {30'h40, 2'b00}, 32'b0, 1, 0, 1, 0);
   
   //load from 0x41 --- HIT
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
   #(20);
@@ -141,6 +152,8 @@ initial begin
   read_outputs(32'h12345678, 32'b0, 32'b0, 0, 0, 1, 0);
 
   //store into 0x40 --- HIT, DIRTY
+  test_num += 1;
+
   dcache_tb.cif.dwait = 1;
   dcache_tb.dcif.dmemREN = 0;
   dcache_tb.dcif.dmemWEN = 1;
@@ -152,6 +165,8 @@ initial begin
   read_outputs(32'h0, {30'h40, 2'b00}, 32'h12345678, 0, 1, 1, 0);
 
   //load from 0x40 --- HIT
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemWEN = 0;
   dcache_tb.dcif.dmemaddr = {30'h40, 2'b00};
@@ -161,6 +176,8 @@ initial begin
   read_outputs(32'h69696969, 32'b0, 32'b0, 0, 0, 1, 0);
   
   //load from 0x41 --- HIT
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemWEN = 0;
   dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
@@ -180,6 +197,8 @@ initial begin
   read_outputs(32'h0, {30'h41, 2'b00}, 32'h69696969, 0, 1, 1, 0);
   
   //load from 0x251 --- MISS
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemWEN = 0;
   dcache_tb.dcif.dmemaddr = {30'h251, 2'b00};
@@ -194,8 +213,7 @@ initial begin
   read_outputs(32'hdad1dad1, {30'h251, 2'b00}, 32'h0, 1, 0, 1, 0);
   
   //save to 0x250 --- HIT, DIRTY
-  dcache_tb.cif.dwait = 1;
-  dcache_tb.dcif.dmemREN = 0;
+  test_num += 1;test_num += 1;
   dcache_tb.dcif.dmemWEN = 1;
   dcache_tb.dcif.dmemaddr = {30'h250, 2'b00};
   dcache_tb.dcif.dmemstore = 32'hDADDADAD;
@@ -205,6 +223,8 @@ initial begin
   read_outputs(32'h0, {30'h250, 2'b00}, 32'hDADDADAD, 0, 1, 1, 0);
   
   //load from 0x3FFFF50 --- MISS
+  test_num += 1;
+
   dcache_tb.dcif.dmemREN = 1;
   dcache_tb.dcif.dmemWEN = 0;
   dcache_tb.dcif.dmemaddr = {30'h3FFFF50, 2'b00};
@@ -223,6 +243,8 @@ initial begin
   read_outputs(32'hdeadbed1, {30'h3FFFF50, 2'b00}, 32'h0, 1, 0, 1, 0);
   
   // HALT
+  test_num += 1;
+
   dcache_tb.cif.dwait = 1;
   dcache_tb.dcif.halt = 1;
   dcache_tb.cif.dwait = 0;
