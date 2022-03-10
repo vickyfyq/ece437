@@ -36,7 +36,7 @@ always_ff @(posedge CLK, negedge nRST) begin
         state <= IDLE;
         frame_cnt <= '0; //count each row of frame from left to right
         cnt <= '0;// count hits
-        hit_left < = '0;//choose left data/right data
+        hit_left <= '0;//choose left data/right data
     end
     else begin
         left <= n_left;
@@ -49,8 +49,8 @@ always_ff @(posedge CLK, negedge nRST) begin
 end
 
 always_comb begin
-    n_left[daddr.idx] = left[daddr.idx]
-    n_right[daddr.idx] = right[daddr.idx]
+    n_left[daddr.idx] = left[daddr.idx];
+    n_right[daddr.idx] = right[daddr.idx];
     miss = 0;
     //datapath output
     dcif.dhit = 0;
@@ -64,7 +64,7 @@ always_comb begin
     n_hit_left = hit_left;
     n_cnt = cnt;
 
-    case(state, n_state)
+    case(state)
         HALT : begin
             dcif.flushed = 1;
         end
@@ -87,33 +87,33 @@ always_comb begin
             cif.dREN = 1;
             cif.daddr = {daddr.tag,daddr.idx,3'h0};
             if (hit_left[daddr.idx]) begin
-                right[daddr.idx].data[0] = cif.dload;
-                right[daddr.idx].tag = daddr.tag
-                right[daddr.idx].dirty = 0;
-                right[daddr.idx].valid = 1;
+                n_right[daddr.idx].data[0] = cif.dload;
+                n_right[daddr.idx].tag = daddr.tag;
+                n_right[daddr.idx].dirty = 0;
+                n_right[daddr.idx].valid = 1;
             end   
             else begin
-                left[daddr.idx].data[0] = cif.dload;
-                left[daddr.idx].tag = daddr.tag
-                left[daddr.idx].dirty = 0;
-                left[daddr.idx].valid = 1;
+                n_left[daddr.idx].data[0] = cif.dload;
+                n_left[daddr.idx].tag = daddr.tag;
+                n_left[daddr.idx].dirty = 0;
+                n_left[daddr.idx].valid = 1;
             end   
         end
         LD1: begin
             cif.dREN = 1;
             cif.daddr = {daddr.tag,daddr.idx,3'h0};
-            if (hit_left[daddr.idx])    right[daddr.idx].data[0] = cif.dload;
-            else    left[daddr.idx].data[0] = cif.dload;
+            if (hit_left[daddr.idx])    n_right[daddr.idx].data[0] = cif.dload;
+            else    n_left[daddr.idx].data[0] = cif.dload;
         end
         WB2 : begin
             cif.dWEN = 1;
             cif.daddr = hit_left[daddr.idx] ? {right[daddr.idx].tag,daddr.idx,3'b100} :{left[daddr.idx].tag,daddr.idx,3'b100};
-            cif.dstore = hit_left[daddr.idx] ? right[daddr.idx].data[1] : left[daddr.idx].data[1]
+            cif.dstore = hit_left[daddr.idx] ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
         end
         WB1 : begin
             cif.dWEN = 1;
             cif.daddr = hit_left[daddr.idx] ? {right[daddr.idx].tag,daddr.idx,3'h0} :{left[daddr.idx].tag,daddr.idx,3'b000};
-            cif.dstore = hit_left[daddr.idx] ? right[daddr.idx].data[0] : left[daddr.idx].data[0]
+            cif.dstore = hit_left[daddr.idx] ? right[daddr.idx].data[0] : left[daddr.idx].data[0];
         end
         IDLE: begin
             if(dcif.dmemREN) begin //read data left frame or right frame or miss
@@ -176,15 +176,15 @@ case(state)
         end
     end
     DIRTY : begin
-        if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[10:8]].dirty&& frame_cnt > 8))
+        if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt > 8))
         //write back the dirty frame
                 n_state = FLUSH1;
-        frame_cnt = frame_cnt + 1;
+        n_frame_cnt = frame_cnt + 1;
         if(frame_cnt == 16) //if went through all the frames, hit cnt +1
             n_state = CNT;
     end
     CNT : begin
-        if (!cif.dwait) next_state = HALT;
+        if (!cif.dwait) n_state = HALT;
     end
     WB1: begin
         if (!cif.dwait) n_state = WB2;
@@ -196,10 +196,10 @@ case(state)
         if (!cif.dwait) n_state = LD2;
     end
     FLUSH1 : begin
-        if (!cif.dwait) next_state = FLUSH2;
+        if (!cif.dwait) n_state = FLUSH2;
     end
     FLUSH2 : begin
-        if (!cif.dwait) next_state = DIRTY;
+        if (!cif.dwait) n_state = DIRTY;
     end
 endcase
 
