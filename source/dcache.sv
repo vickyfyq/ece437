@@ -3,7 +3,7 @@ import cpu_types_pkg::*;
 `include "caches_if.vh"
 module dcache (
 	input logic CLK, nRST,
-	datapath_cache_if dcif,
+	datapath_cache_if.dcache dcif,
 	caches_if.dcache cif
 );
 
@@ -52,12 +52,15 @@ always_comb begin
     n_left[daddr.idx] = left[daddr.idx]
     n_right[daddr.idx] = right[daddr.idx]
     miss = 0;
+    //datapath output
     dcif.dhit = 0;
-	dcif.dmemload = 0;	
+	dcif.dmemload = 0;
+    //cache output	
     cif.daddr = 0;
 	cif.dstore = 0;
 	cif.dREN = 0;
 	cif.dWEN = 0;
+
     n_hit_left = hit_left;
     n_cnt = cnt;
 
