@@ -119,6 +119,114 @@ initial begin
 
   reset_dut();
 
+  //load from 0x40 --- MISS
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemaddr = {30'h40, 2'b00};
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hABCDEF00;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'h12345678;
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h12345678, {30'h40, 2'b00}, 32'b0, 1, 0, 1, 0);
+  
+  //load from 0x41 --- HIT
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h12345678, 32'b0, 32'b0, 0, 0, 1, 0);
+
+  //store into 0x40 --- HIT, DIRTY
+  dcache_tb.cif.dwait = 1;
+  dcache_tb.dcif.dmemREN = 0;
+  dcache_tb.dcif.dmemWEN = 1;
+  dcache_tb.dcif.dmemaddr = {30'h40, 2'b00};
+  dcache_tb.dcif.dmemstore = 32'h69696969;
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h0, {30'h40, 2'b00}, 32'h12345678, 0, 1, 1, 0);
+
+  //load from 0x40 --- HIT
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemWEN = 0;
+  dcache_tb.dcif.dmemaddr = {30'h40, 2'b00};
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h69696969, 32'b0, 32'b0, 0, 0, 1, 0);
+  
+  //load from 0x41 --- HIT
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemWEN = 0;
+  dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h69696969, 32'b0, 32'b0, 0, 0, 1, 0);
+  
+   //store to 0x41 --- HIT, DIRTY 
+  dcache_tb.dcif.dmemREN = 0;
+  dcache_tb.dcif.dmemWEN = 1;
+  dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
+  dcache_tb.dcif.dmemstore = 32'h96969696;
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h0, {30'h41, 2'b00}, 32'h69696969, 0, 1, 1, 0);
+  
+  //load from 0x251 --- MISS
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemWEN = 0;
+  dcache_tb.dcif.dmemaddr = {30'h251, 2'b00};
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hbad1bad1;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hdad1dad1;
+  #(20);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'hdad1dad1, {30'h251, 2'b00}, 32'h0, 1, 0, 1, 0);
+  
+  //save to 0x250 --- HIT, DIRTY
+  dcache_tb.cif.dwait = 1;
+  dcache_tb.dcif.dmemREN = 0;
+  dcache_tb.dcif.dmemWEN = 1;
+  dcache_tb.dcif.dmemaddr = {30'h250, 2'b00};
+  dcache_tb.dcif.dmemstore = 32'hDADDADAD;
+  #(10);
+
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'h0, {30'h250, 2'b00}, 32'hDADDADAD, 0, 1, 1, 0);
+  
+  //load from 0x3FFFF50 --- MISS
+  dcache_tb.dcif.dmemREN = 1;
+  dcache_tb.dcif.dmemWEN = 0;
+  dcache_tb.dcif.dmemaddr = {30'h3FFFF50, 2'b00};
+  dcache_tb.cif.dwait = 0;
+  #(20);
+  dcache_tb.cif.dwait = 1;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'h55555555;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hdeadbed1;
+  #(10);
+  
+  //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
+  read_outputs(32'hdeadbed1, {30'h3FFFF50, 2'b00}, 32'h0, 1, 0, 1, 0);
+  
+  // HALT
+  dcache_tb.cif.dwait = 1;
+  dcache_tb.dcif.halt = 1;
+  dcache_tb.cif.dwait = 0;
+
 end
 
 endprogram
