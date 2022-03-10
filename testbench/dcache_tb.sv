@@ -59,11 +59,40 @@ begin
 end
 
 task read_outputs;
-word_t dmemstore;
-word_t dREN, dWEN, daddr, dstore,;
-logic
+input word_t dmemload;
+input word_t daddr;
+input word_t dstore;
+input logic dREN;
+input logic dWEN;
+input logic dhit;
+input logic flushed;
+logic correct;
 begin
+    correct = 1;
+    assert(dmemload == dcif.dmemload)
+        $display("Incorrect output of dcif.dmemload for test case %0d. Expected: %0h, Actual: %0h", test_num, dmemload, dcif.dmemload);
 
+    assert(daddr == cif.daddr)
+        $display("Incorrect output of cif.daddr for test case %0d. Expected: %0h, Actual: %0h", test_num, daddr, cif.daddr);
+    
+    assert(dstore == cif.dstore)
+        $display("Incorrect output of cif.dstore for test case %0d. Expected: %0h, Actual: %0h", test_num, dstore, cif.dstore);
+    
+    assert(dREN == cif.dREN)
+        $display("Incorrect output of cif.dREN for test case %0d. Expected: %0h, Actual: %0h", test_num, dREN, cif.dREN);
+    
+    assert(dWEN == cif.dWEN)
+        $display("Incorrect output of cif.dWEN for test case %0d. Expected: %0h, Actual: %0h", test_num, dWEN, cif.dWEN);
+    
+    assert(dhit == dcif.dhit)
+        $display("Incorrect output of dcif.dhit for test case %0d. Expected: %0h, Actual: %0h", test_num, dhit, dcif.dhit);
+    
+    assert(flushed == dcif.flushed)
+        $display("Incorrect output of dcif.flushed for test case %0d. Expected: %0h, Actual: %0h", test_num, flushed, dcif.flushed);
+    
+    assert(correct)
+        $display("Correct output for test case %0d", test_num);
+    
 end
 
 initial begin
@@ -90,9 +119,6 @@ initial begin
 
   reset_dut();
 
-
-  
-  
 end
 
 endprogram
