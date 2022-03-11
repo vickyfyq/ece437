@@ -45,6 +45,7 @@ assign ihit = ~cif.iwait;
 assign imemload = cif.iload;
 
 always_comb begin
+    nextstate = state;
     casez (state) 
         HIT:
             if(!dcif.halt && dcif.imemREN && !dcif.dmemREN && !dcif.dmemWEN)
@@ -60,9 +61,9 @@ end
 always_comb begin
 
     casez (state)
-        HIT:
-            cif.iREN = 0;
-            cif.iaddr = 0;
+        HIT: begin
+            cif.iREN = '0;
+            cif.iaddr = '0;
             dcif.ihit = 0;
             dcif.imemload = '0;
             if(!dcif.halt && dcif.imemREN && !dcif.dmemREN && !dcif.dmemWEN) begin
@@ -71,12 +72,14 @@ always_comb begin
                     dcif.imemload = hashTable[index].data;
                 end
             end
-        MISS:
+        end
+        MISS: begin
             cif.iREN = dcif.imemREN;
             cif.iaddr = dcif.imemaddr;
             dcif.ihit = ihit;
             dcif.imemload = imemload;
 		end
+    endcase
 end
 
 endmodule // icache

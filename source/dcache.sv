@@ -60,7 +60,7 @@ always_comb begin
 	cif.dstore = 0;
 	cif.dREN = 0;
 	cif.dWEN = 0;
-
+    dcif.flushed = 0;
     n_hit_left = hit_left;
     n_cnt = cnt;
 

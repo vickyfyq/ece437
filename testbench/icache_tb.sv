@@ -12,10 +12,10 @@ module icache_tb;
 
     test PROG(CLK, nRST, dcif, cif);
 
-    `ifndef MAPPED
-  alu DUT(CLK, nRST,dcif,cif);
+`ifndef MAPPED
+  icache DUT(CLK, nRST,dcif,cif);
 `else
-  alu DUT(
+  icache DUT(
     .\CLK(CLK),
     .\nRST(nRST),
     .\cif.iwait(cif.iwait),
@@ -33,67 +33,80 @@ endmodule
 
 program test(input logic CLK, nRST, datapath_cache_if dcif,caches_if cif);
 import cpu_types_pkg::*;
+string testcase;
+task msg;
+
+  input logic ihit, iREN;
+  input logic [31:0] imemload, iaddr; 
+  begin
+  if (dcif.ihit == ihit && cif.iREN == iREN&& dcif.imemload == imemload  && cif.iaddr == iaddr) 
+      $display("Pass %s", testcase);
+  else begin
+    $display("!!!!!!!!failed %s ihit %d iREN %d imemload %d", testcase,dcif.ihit, dcif.dhit,dcif.imemload);
+    end
+  end
+endtask
 initial begin
-    nRST = 0;
+    // string testcase; 
+    dcif.halt = '0;
+    dcif.dmemREN = '0;
+    dcif.dmemWEN = '0;
+
+    icache_tb.nRST = 0;
     #(10);
-    nRST = 1;
+    icache_tb.nRST = 1;
     //write to index
-    fcif.imemaddr = {26'hfff, 4'd1, 2'b00}
+    dcif.imemaddr = {26'hfff, 4'd1, 2'b00};
     #(10);
     cif.iload = 32'he00ee00e;
-    cif.iwait = 0;
-    #(20);
-    cif.iwait = 1;
-    
-    fcif.imemaddr = {26'hfff, 4'd2, 2'b00}
-    #(10);
-    cif.iload = 32'he2222222;
-    cif.iwait = 0;
-    #(20);
-    cif.iwait = 1;
-
-    fcif.imemaddr = {26'hfff, 4'd3, 2'b00}
-    #(10);
-    cif.iload = 32'he3333333;
+    dcif.imemREN = 1;
     cif.iwait = 0;
     #(20);
     cif.iwait = 1;
     
 
     dcif.imemaddr = {26'hfff, 4'd1, 2'b00};
-    cif.iload = 32'h0;
     cif.iwait = 1;
     dcif.imemREN = 1;
     #(10);
- 
-    msg("tag matches", 1, 0, 32'he00ee00e, 0);
+    
+    testcase = "tag matches";
+    msg(1, 0, 32'he00ee00e, '0);
+    #(10);
+
+
+
+
+    dcif.imemaddr = {26'hfff, 4'd2, 2'b00};
+    #(10);
+    cif.iload = 32'he2222222;
+    cif.iwait = 0;
+    #(20);
+    cif.iwait = 1;
+
+    dcif.imemaddr = {26'hfff, 4'd3, 2'b00};
+    #(10);
+    cif.iload = 32'he3333333;
+    cif.iwait = 0;
+    #(20);
+    cif.iwait = 1;
 
     dcif.imemaddr = {26'hff, 4'd2, 2'b00};
     cif.iload = 32'haaaaaaaa;
     cif.iwait = 0;
     dcif.imemREN = 1;
     #(10);
-
-    msg("tag not match", 1, 1, 32'haaaaaaaa, {26'hff, 4'd2, 2'b00});
-
+    testcase = "tag not match";
+    msg(1, 1, 32'haaaaaaaa, {26'hff, 4'd2, 2'b00});
+    #(10);
     dcif.imemaddr = {26'hfff, 4'd3, 2'b00};
     cif.iload = 32'h0;
     cif.iwait = 1;
     dcif.imemREN = 0;
     #(10);
-
-    msg("not reading", 0,0,'0,'0);
+    testcase = "not reading";
+    msg(0,0,'0,'0);
 
 end
+endprogram
 
-task msg;
-    string testcase;
-    input logic ihit, iREN;
-    input logic [31:0] imemload, iaddr; 
-
-    begin
-    correct = 0;
-    if (dcif.ihit == ihit && dcif.imemload == imemload && cif.iREN == iREN && cif.iaddr == iaddr) 
-        $display("Pass %s", testcase);
-    else $display("!!!!!!!!failed %s", testcase);
-  endtask
