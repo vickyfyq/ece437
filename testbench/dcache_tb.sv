@@ -45,6 +45,8 @@ endmodule
 
 program test(input logic CLK, output logic nRST, caches_if cif, datapath_cache_if dcif);
 int test_num;
+logic [3:0] i;
+int done;
 import cpu_types_pkg::*;
 /*
 task reset_dut;
@@ -205,13 +207,35 @@ initial begin
   //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
   read_outputs(32'h12345678, 32'b0, 32'b0, 0, 0, 1, 0);
   
-   //store to 0x41 --- HIT, DIRTY 
+   //store to 0x4 --- MISS 
   //Test 6:
   test_num += 1;
   dcache_tb.dcif.dmemREN = 0;
-  dcache_tb.dcif.dmemWEN = 1;
-  dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
+  dcache_tb.dcif.dmemWEN = 1; //0100 0001 00
+  dcache_tb.dcif.dmemaddr = {26'h50, 3'b000, 3'b100};
   dcache_tb.dcif.dmemstore = 32'h96969696;
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hbad1bad1;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hbad2bad2;
+  #(20);
+
+   //store to 0x4 --- MISS, DIRTY 
+  
+  test_num += 1;
+  dcache_tb.dcif.dmemREN = 0;
+  dcache_tb.dcif.dmemWEN = 1; //0100 0001 00
+  dcache_tb.dcif.dmemaddr = {26'h100, 3'b000, 3'b100};
+  dcache_tb.dcif.dmemstore = 32'h96969696;
+  dcache_tb.cif.dwait = 0;
+  #(20);
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hbad1bad1;
+  #(20);
+  dcache_tb.cif.dwait = 0;
+  dcache_tb.cif.dload = 32'hbad2bad2;
   #(20);
 
   //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
@@ -269,10 +293,42 @@ initial begin
   
   // HALT
   test_num += 1;
+  for (i = 0; !done; i++) begin
+      done = 0;
+		  if(i < 8) begin
+        dcache_tb.dcif.dmemREN = 0;
+        dcache_tb.dcif.dmemWEN = 1;
+        dcache_tb.dcif.dmemaddr = {26'h200, i[2:0], 3'b000};
+        dcache_tb.dcif.dmemstore = 32'hDAD1DAD1;
+        dcache_tb.cif.dwait = 0;
+        dcache_tb.cif.dload = 32'hABCDEF00;
+        #(20);
+        dcache_tb.cif.dwait = 0;
+        dcache_tb.cif.dload = 32'h12345678;
+        #(20);
+      end
+      else begin
+        dcache_tb.dcif.dmemREN = 0;
+        dcache_tb.dcif.dmemWEN = 1;
+        dcache_tb.dcif.dmemaddr = {26'h204, i[2:0], 3'b000};
+        dcache_tb.dcif.dmemstore = 32'hDAD1DAD1;
+        dcache_tb.cif.dwait = 0;
+        dcache_tb.cif.dload = 32'hABCDEF00;
+        #(20);
+        dcache_tb.cif.dwait = 0;
+        dcache_tb.cif.dload = 32'h12345678;
+        #(20);
+        if(i == 15)
+          done = 1;
+      end
+	end
+  
 
   dcache_tb.cif.dwait = 1;
   dcache_tb.dcif.halt = 1;
   dcache_tb.cif.dwait = 0;
+  #(5000)
+  $finish;
 
 end
 

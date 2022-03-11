@@ -168,7 +168,7 @@ case(state)
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
         else if (miss) begin
-            if((daddr.tag == left[daddr.idx].tag && left[daddr.idx].dirty) || (daddr.tag == right[daddr.idx].tag && right[daddr.idx].dirty)) 
+            if((hit_left[daddr.idx] == 0 && left[daddr.idx].dirty) || (hit_left[daddr.idx] && right[daddr.idx].dirty)) 
             //left frame or right frame dirty
                 n_state = WB1;
             else 
