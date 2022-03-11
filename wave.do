@@ -22,9 +22,9 @@ add wave -noupdate /dcache_tb/DUT/left
 add wave -noupdate /dcache_tb/DUT/right
 add wave -noupdate /dcache_tb/DUT/n_left
 add wave -noupdate /dcache_tb/DUT/n_right
-add wave -noupdate /dcache_tb/DUT/daddr
+add wave -noupdate /dcache_tb/DUT/hit_left
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {163 ns} 0}
+WaveRestoreCursors {{Cursor 1} {164 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -40,4 +40,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {145 ns} {228 ns}
+WaveRestoreZoom {142 ns} {225 ns}
