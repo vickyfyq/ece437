@@ -70,26 +70,40 @@ input logic flushed;
 logic correct;
 begin
     correct = 1;
-    assert(dmemload == dcif.dmemload)
+    assert(dmemload != dcif.dmemload) begin
         $display("Incorrect output of dcif.dmemload for test case %0d. Expected: %0h, Actual: %0h", test_num, dmemload, dcif.dmemload);
+        correct = 0;
+    end
 
-    assert(daddr == cif.daddr)
+    assert(daddr != cif.daddr) begin
         $display("Incorrect output of cif.daddr for test case %0d. Expected: %0h, Actual: %0h", test_num, daddr, cif.daddr);
+        correct = 0;
+    end
     
-    assert(dstore == cif.dstore)
+    assert(dstore != cif.dstore) begin
         $display("Incorrect output of cif.dstore for test case %0d. Expected: %0h, Actual: %0h", test_num, dstore, cif.dstore);
+        correct = 0;
+    end
     
-    assert(dREN == cif.dREN)
+    assert(dREN != cif.dREN) begin
         $display("Incorrect output of cif.dREN for test case %0d. Expected: %0h, Actual: %0h", test_num, dREN, cif.dREN);
+        correct = 0;
+    end
     
-    assert(dWEN == cif.dWEN)
+    assert(dWEN != cif.dWEN) begin
         $display("Incorrect output of cif.dWEN for test case %0d. Expected: %0h, Actual: %0h", test_num, dWEN, cif.dWEN);
+        correct = 0;
+    end
     
-    assert(dhit == dcif.dhit)
+    assert(dhit != dcif.dhit) begin
         $display("Incorrect output of dcif.dhit for test case %0d. Expected: %0h, Actual: %0h", test_num, dhit, dcif.dhit);
+        correct = 0;
+    end
     
-    assert(flushed == dcif.flushed)
+    assert(flushed != dcif.flushed) begin
         $display("Incorrect output of dcif.flushed for test case %0d. Expected: %0h, Actual: %0h", test_num, flushed, dcif.flushed);
+        correct = 0;
+    end
     
     assert(correct)
         $display("Correct output for test case %0d", test_num);
@@ -127,6 +141,7 @@ initial begin
   @(posedge CLK);
 
   //load from 0x40 --- MISS
+  //Test 1:
   test_num += 1;
 
   dcache_tb.dcif.dmemREN = 1;
@@ -139,9 +154,10 @@ initial begin
   #(20);
 
   //task read_outputs( memload; daddr; dstore; dREN; dWEN; dhit; flushed; )
-  read_outputs(32'h12345678, {30'h40, 2'b00}, 32'b0, 1, 0, 1, 0);
+  read_outputs(32'hABCDEF00, 32'b0, 32'b0, 0, 0, 1, 0);
   
   //load from 0x41 --- HIT
+  //Test 2:
   test_num += 1;
 
   dcache_tb.dcif.dmemREN = 1;
@@ -152,6 +168,7 @@ initial begin
   read_outputs(32'h12345678, 32'b0, 32'b0, 0, 0, 1, 0);
 
   //store into 0x40 --- HIT, DIRTY
+  //Test 3:
   test_num += 1;
 
   dcache_tb.cif.dwait = 1;
@@ -165,6 +182,7 @@ initial begin
   read_outputs(32'h0, {30'h40, 2'b00}, 32'h12345678, 0, 1, 1, 0);
 
   //load from 0x40 --- HIT
+  //Test 4:
   test_num += 1;
 
   dcache_tb.dcif.dmemREN = 1;
@@ -176,6 +194,7 @@ initial begin
   read_outputs(32'h69696969, 32'b0, 32'b0, 0, 0, 1, 0);
   
   //load from 0x41 --- HIT
+  //Test 5:
   test_num += 1;
 
   dcache_tb.dcif.dmemREN = 1;
@@ -187,6 +206,8 @@ initial begin
   read_outputs(32'h69696969, 32'b0, 32'b0, 0, 0, 1, 0);
   
    //store to 0x41 --- HIT, DIRTY 
+  //Test 6:
+  test_num += 1;
   dcache_tb.dcif.dmemREN = 0;
   dcache_tb.dcif.dmemWEN = 1;
   dcache_tb.dcif.dmemaddr = {30'h41, 2'b00};
@@ -197,6 +218,7 @@ initial begin
   read_outputs(32'h0, {30'h41, 2'b00}, 32'h69696969, 0, 1, 1, 0);
   
   //load from 0x251 --- MISS
+  //Test 7:
   test_num += 1;
 
   dcache_tb.dcif.dmemREN = 1;
@@ -213,7 +235,8 @@ initial begin
   read_outputs(32'hdad1dad1, {30'h251, 2'b00}, 32'h0, 1, 0, 1, 0);
   
   //save to 0x250 --- HIT, DIRTY
-  test_num += 1;test_num += 1;
+  //Test 8:
+  test_num += 1;
   dcache_tb.dcif.dmemWEN = 1;
   dcache_tb.dcif.dmemaddr = {30'h250, 2'b00};
   dcache_tb.dcif.dmemstore = 32'hDADDADAD;
