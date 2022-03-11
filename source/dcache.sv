@@ -49,8 +49,8 @@ always_ff @(posedge CLK, negedge nRST) begin
 end
 
 always_comb begin
-    n_left[daddr.idx] = left[daddr.idx];
-    n_right[daddr.idx] = right[daddr.idx];
+    n_left = left;
+    n_right = right;
     miss = 0;
     //datapath output
     dcif.dhit = 0;
@@ -87,13 +87,13 @@ always_comb begin
             cif.dREN = 1;
             cif.daddr = {daddr.tag,daddr.idx,3'h0};
             if (hit_left[daddr.idx]) begin
-                n_right[daddr.idx].data[0] = cif.dload;
+                n_right[daddr.idx].data[1] = cif.dload;
                 n_right[daddr.idx].tag = daddr.tag;
                 n_right[daddr.idx].dirty = 0;
                 n_right[daddr.idx].valid = 1;
             end   
             else begin
-                n_left[daddr.idx].data[0] = cif.dload;
+                n_left[daddr.idx].data[1] = cif.dload;
                 n_left[daddr.idx].tag = daddr.tag;
                 n_left[daddr.idx].dirty = 0;
                 n_left[daddr.idx].valid = 1;
@@ -168,7 +168,7 @@ case(state)
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
         else if (miss) begin
-            if((hit_left[daddr.idx]==0 && left[daddr.idx].dirty) || (hit_left[daddr.idx] && right[daddr.idx].dirty)) 
+            if((daddr.tag == left[daddr.idx].tag && left[daddr.idx].dirty) || (daddr.tag == right[daddr.idx].tag && right[daddr.idx].dirty)) 
             //left frame or right frame dirty
                 n_state = WB1;
             else 
@@ -194,6 +194,9 @@ case(state)
     end
     LD1: begin
         if (!cif.dwait) n_state = LD2;
+    end
+    LD2: begin
+        if (!cif.dwait) n_state = IDLE;
     end
     FLUSH1 : begin
         if (!cif.dwait) n_state = FLUSH2;
