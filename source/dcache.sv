@@ -26,7 +26,8 @@ state_t state, n_state;
 logic miss;
 logic [7:0] hit_left, n_hit_left; //choose left or right frame
 word_t cnt, n_cnt; //hit count
-logic [4:0] frame_cnt, n_frame_cnt; //select each row frame
+logic [4:0] frame_cnt, n_frame_cnt, frame_cnt_sub; //select each row frame
+logic [2:0] idx;
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -62,7 +63,8 @@ always_comb begin
     dcif.flushed = 0;
     n_hit_left = hit_left;
     n_cnt = cnt;
-
+    idx = 0;
+    
     case(state)
         HALT : begin
             dcif.flushed = 1;
@@ -74,17 +76,42 @@ always_comb begin
 		end   
         FLUSH1 : begin
             cif.dWEN = 1;
-            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b000}:{right[daddr.idx], frame_cnt-8, 3'b000};
-            cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[0] : left[daddr.idx].data[0];
+            //cif.daddr = ((frame_cnt - 1) < 8) ? {left[frame_cnt -1].tag, frame_cnt -1, 3'b000}:{right[frame_cnt-8].tag, frame_cnt-8, 3'b000};
+            //cif.dstore = ((frame_cnt - 1) > 8) ? right[frame_cnt-8].data[0] : left[frame_cnt-1].data[0];
+            if(frame_cnt - 1 < 8) begin
+                frame_cnt_sub = frame_cnt - 1;
+                idx = frame_cnt_sub[2:0];
+                cif.daddr = {left[idx].tag, idx, 3'b000};
+                //cif.daddr = {left[frame_cnt -1].tag, frame_cnt -1, 3'b000};
+                cif.dstore = left[idx].data[0];
+            end
+            else begin
+                frame_cnt_sub = frame_cnt - 9;
+                idx = frame_cnt_sub[2:0];
+                cif.daddr = {right[idx].tag, idx, 3'b000};
+                cif.dstore = right[idx].data[0];
+            end
         end    
         FLUSH2 : begin
             cif.dWEN = 1;
-            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b100}:{right[daddr.idx], frame_cnt-8, 3'b100};
-            cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
+            //cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b100}:{right[daddr.idx].tag, frame_cnt-8, 3'b100};
+            //cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
+            if(frame_cnt - 1 < 8) begin
+                frame_cnt_sub = frame_cnt - 1;
+                idx = frame_cnt_sub[2:0];
+                cif.daddr = {left[idx].tag, idx, 3'b100};
+                cif.dstore = left[idx].data[1];
+            end
+            else begin
+                frame_cnt_sub = frame_cnt - 9;
+                idx = frame_cnt_sub[2:0];
+                cif.daddr = {right[idx].tag, idx, 3'b100};
+                cif.dstore = right[idx].data[1];
+            end
         end  
         LD2: begin
             cif.dREN = 1;
-            cif.daddr = {daddr.tag,daddr.idx,3'h0};
+            cif.daddr = {daddr.tag,daddr.idx,3'b100};
             if (hit_left[daddr.idx]) begin
                 n_right[daddr.idx].data[1] = cif.dload;
                 n_right[daddr.idx].tag = daddr.tag;
@@ -175,7 +202,7 @@ case(state)
         end
     end
     DIRTY : begin
-        if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt > 8))
+        if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt >= 8))
         //write back the dirty frame
                 n_state = FLUSH1;
         n_frame_cnt = frame_cnt + 1;

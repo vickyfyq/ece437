@@ -134,7 +134,7 @@ add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/CLK
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/nRST
 add wave -noupdate -expand -group dcache -expand /system_tb/DUT/CPU/CM/DCACHE/daddr
 add wave -noupdate -expand -group dcache -expand /system_tb/DUT/CPU/CM/DCACHE/left
-add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/right
+add wave -noupdate -expand -group dcache -expand /system_tb/DUT/CPU/CM/DCACHE/right
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/n_left
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/n_right
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/state
@@ -146,6 +146,7 @@ add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/cnt
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/n_cnt
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/frame_cnt
 add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/n_frame_cnt
+add wave -noupdate -expand -group dcache /system_tb/DUT/CPU/CM/DCACHE/idx
 add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/iwait
 add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/dwait
 add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/iREN
@@ -157,7 +158,7 @@ add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/dstore
 add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/iaddr
 add wave -noupdate -expand -group cif /system_tb/DUT/CPU/CM/cif/daddr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {598798 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1145600 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -173,4 +174,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {358 ns} {716 ns}
+WaveRestoreZoom {787600 ps} {1145600 ps}
