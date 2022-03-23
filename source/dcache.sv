@@ -23,7 +23,6 @@ typedef enum logic[3:0] {
 	IDLE, WB1, WB2, LD1, LD2, FLUSH1, FLUSH2, DIRTY, CNT, HALT
 } state_t;
 state_t state, n_state;
-integer i;
 logic miss;
 logic [7:0] hit_left, n_hit_left; //choose left or right frame
 word_t cnt, n_cnt; //hit count
@@ -75,12 +74,12 @@ always_comb begin
 		end   
         FLUSH1 : begin
             cif.dWEN = 1;
-            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx], frame_cnt -1, 3'b000}:{right[daddr.idx], frame_cnt-1, 3'b000};
+            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b000}:{right[daddr.idx], frame_cnt-8, 3'b000};
             cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[0] : left[daddr.idx].data[0];
         end    
         FLUSH2 : begin
             cif.dWEN = 1;
-            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx], frame_cnt -1, 3'b000}:{right[daddr.idx], frame_cnt-1, 3'b100};
+            cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b100}:{right[daddr.idx], frame_cnt-8, 3'b100};
             cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
         end  
         LD2: begin
@@ -137,14 +136,14 @@ always_comb begin
             end
 
             else if(dcif.dmemWEN) begin //read data left frame or right frame or miss
-                if(daddr.tag == left[daddr.idx].tag ) begin//if left matches, hit
+                if(daddr.tag == left[daddr.idx].tag && left[daddr.idx].valid) begin//if left matches, hit
                     dcif.dhit = 1;
                     n_cnt = cnt + 1;
                     n_left[daddr.idx].dirty = 1;
                     n_hit_left[daddr.idx] = 1; //left hit next try right
                     n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
 
-                end else if (daddr.tag == right[daddr.idx].tag ) begin //if right matches, hit
+                end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
                     dcif.dhit = 1;
                     n_cnt = cnt + 1;
                     n_right[daddr.idx].dirty = 1;
@@ -191,7 +190,7 @@ case(state)
     end
     WB2: begin
         if (!cif.dwait) n_state = LD1;
-    end
+    end 
     LD1: begin
         if (!cif.dwait) n_state = LD2;
     end

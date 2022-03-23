@@ -14,7 +14,7 @@ logic [25:0] tag;
 logic [3:0] index;
 
 word_t imemload;
-logic ihit, miss;
+logic ihit;
 integer i;
 typedef enum logic { HIT, MISS } state_t;
 state_t state, nextstate;
