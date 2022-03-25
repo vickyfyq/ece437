@@ -3,7 +3,7 @@ import cpu_types_pkg::*;
 `include "caches_if.vh"
 module dcache (
 	input logic CLK, nRST,
-	datapath_cache_if.dcache dcif,
+	datapath_cache_if dcif,
 	caches_if.dcache cif
 );
 
@@ -64,7 +64,8 @@ always_comb begin
     n_hit_left = hit_left;
     n_cnt = cnt;
     idx = 0;
-    
+    frame_cnt_sub = 0;
+
     case(state)
         HALT : begin
             dcif.flushed = 1;
@@ -182,6 +183,23 @@ always_comb begin
                     n_cnt = cnt - 1; //decrement hit count when miss
                 end
             end
+        end
+        default : begin
+            n_left = left;
+            n_right = right;
+            miss = 0;
+            //datapath output
+            dcif.dhit = 0;
+            dcif.dmemload = 0;
+            //cache output	
+            cif.daddr = 0;
+            cif.dstore = 0;
+            cif.dREN = 0;
+            cif.dWEN = 0;
+            dcif.flushed = 0;
+            n_hit_left = hit_left;
+            n_cnt = cnt;
+            idx = 0;
         end
     endcase
 end
