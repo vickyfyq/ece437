@@ -28,8 +28,8 @@ module memory_control (
 
   state_t state, nextstate;
   logic snooper, next_snooper;
-  word_t [CPUS-1:0] next_ccsnoopaddr;
   logic  [CPUS-1:0] next_ccwait, next_ccinv;
+  word_t [CPUS-1:0] next_ccsnoopaddr;
 
   always_ff @ (posedge CLK, negedge nRST) begin
     if(nRST == 0) begin
@@ -100,17 +100,119 @@ module memory_control (
     endcase 
   end
 
+//Output logic 
+always_comb begin
+  ccif.iwait = 2'b11;
+  ccif.iload = '0;
+  ccif.dwait = 2'b11;
+  ccif.dload = '0;
 
-/*
-  assign ccif.iwait = ~(ccif.iREN && ~ccif.dWEN && ~ccif.dREN && (ccif.ramstate == ACCESS));
-  assign ccif.dwait = ~((ccif.dWEN || ccif.dREN) && (ccif.ramstate == ACCESS));
-  assign ccif.iload = ccif.iREN ? ccif.ramload : '0;
-  assign ccif.dload = ccif.dREN ? ccif.ramload : '0;
-  assign ccif.ramstore = ccif.dstore;
-  assign ccif.ramWEN = ccif.dWEN;
-  assign ccif.ramaddr = (ccif.dREN || ccif.dWEN) ? ccif.daddr : ccif.iaddr;
-  assign ccif.ramREN = (ccif.dREN || ccif.iREN) & ~ccif.dWEN;
-*/
+  ccif.ramaddr = '0;
+  ccif.ramstore = '0;
+  ccif.ramWEN = 0;
+  ccif.ramREN = 0;
 
+  ccif.ccwait = 2'b00;
+  ccif.ccsnoopaddr = '0;
+  ccif.ccinv[0] = ccif.ccwrite[1];
+  ccif.ccinv[1] = ccif.ccwrite[0];
+  case (state)
+    IFETCH: begin
+      if(iREN[0] == 1) begin
+        ccif.ramaddr = ccif.iaddr[0];
+        ccif.ramREN = iREN[0];
+        ccif.iwait[0] = ccif.ramstate != ACCESS;
+        ccif.iload[0] = ccif.ramload;
+      end
+      else if(iREN[1] == 1) begin
+        ccif.ramaddr = ccif.iaddr[1];
+        ccif.ramREN = iREN[1];
+        ccif.iwait[1] = ccif.ramstate != ACCESS;
+        ccif.iload[1] = ccif.ramload;
+      end
+    end
+    WB1: begin
+      if(ccif.dWEN[0])begin
+        ccif.ramaddr = ccif.daddr[0];
+        ccif.ramWEN = ccif.dWEN[0];
+        ccif.ramstore = ccif.dstore[0];
+        ccif.dhit[0] = ccif.ramstate != ACCESS;
+        ccif.ccwait[1] = 1;
+      end
+      else if(ccif.dWEN[1]) begin
+        ccif.ramaddr = ccif.daddr[1];
+        ccif.ramWEN = ccif.dWEN[1];
+        ccif.ramstore = ccif.dstore[1];
+        ccif.dhit[1] = ccif.ramstate != ACCESS;
+        ccif.ccwait[0] = 1;
+      end
+    end
+    WB2: begin
+      if(ccif.dWEN[0])begin
+        ccif.ramaddr = ccif.daddr[0];
+        ccif.ramWEN = ccif.dWEN[0];
+        ccif.ramstore = ccif.dstore[0];
+        ccif.dhit[0] = ccif.ramstate != ACCESS;
+        ccif.ccwait[1] = 1;
+      end
+      else if(ccif.dWEN[1]) begin
+        ccif.ramaddr = ccif.daddr[1];
+        ccif.ramWEN = ccif.dWEN[1];
+        ccif.ramstore = ccif.dstore[1];
+        ccif.dhit[1] = ccif.ramstate != ACCESS;
+        ccif.ccwait[0] = 1;
+      end
+    end
+
+    ARBITRATE: begin
+      ccif.ccwait[~next_snooper] = 1;
+      ccif.ccsnoopaddr[~next_snooper] = ccif.daddr[snooper];
+    end
+
+    SNOOP: begin
+      ccif.ccwait[~snooper] = 1;
+      ccif.ccsnoopaddr[~snooper] = ccif.daddr[snooper];
+    end
+
+    LDRAM1: begin
+      ccif.dwait[snooper] = ccif.ramstate != ACCESS;
+      ccif.dload[snooper] = ccif.ramload;
+      ccif.ramaddr = ccif.daddr[snooper];
+      ccif.ramREN = ccif.dREN[snooper];
+      ccif.ccwait[~snooper] = 1;
+    end
+
+    LDRAM2: begin
+      ccif.dwait[snooper] = ccif.ramstate != ACCESS;
+      ccif.dload[snooper] = ccif.ramload;
+      ccif.ramaddr = ccif.daddr[snooper];
+      ccif.ramREN = ccif.dREN[snooper];
+      ccif.ccwait[~snooper] = 1;
+    end
+
+    LDCACHE1: begin
+      ccif.dwait[snooper] = ccif.ramstate != ACCESS;
+      ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
+      ccif.dload[snooper] = ccif.dstore[~snooper];
+      ccif.ramaddr = ccif.daddr[~snooper];
+      ccif.ramstore = ccif.dstore[~snooper];
+      ccif.ramWEN = 1;
+      ccif.ccwait[~snooper] = 1;
+      ccif.ccsnoopaddr = ccif.daddr[snooper];
+    end
+
+    LDCACHE2: begin
+      ccif.dwait[snooper] = ccif.ramstate != ACCESS;
+      ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
+      ccif.dload[snooper] = ccif.dstore[~snooper];
+      ccif.ramaddr = ccif.daddr[~snooper];
+      ccif.ramstore = ccif.dstore[~snooper];
+      ccif.ramWEN = 1;
+      ccif.ccwait[~snooper] = 1;
+      ccif.ccsnoopaddr = ccif.daddr[snooper];
+    end
+  endcase
+
+end
 
 endmodule
