@@ -6,6 +6,11 @@
 
 `timescale 1 ns / 1 ns
 
+  typedef enum logic[3:0] {
+    IDLE, WB1, WB2, IFETCH, ARB, LDRAM1, LDRAM2, LDCACHE1, LDCACHE2, SNOOP
+  } state_t;
+
+
 module memory_control_tb;
 
   parameter PERIOD = 10;
@@ -17,21 +22,21 @@ module memory_control_tb;
 
   caches_if cif0();
   caches_if cif1();
-  cache_control_if #(.CPUS(1))ccif(cif0,cif1);
-  cpu_ram_if crif();
+  cache_control_if #(.CPUS(2))ccif(cif0,cif1);
 
-  assign ccif.ramload =crif.ramload;
-  assign ccif.ramstate = crif.ramstate;
-  assign crif.ramstore = ccif.ramstore;
-  assign crif.ramaddr = ccif.ramaddr;
-  assign crif.ramWEN = ccif.ramWEN;
-  assign crif.ramREN = ccif.ramREN;
+  
+  // assign ccif.ramload =crif.ramload;
+  // assign ccif.ramstate = crif.ramstate;
+  // assign crif.ramstore = ccif.ramstore;
+  // assign crif.ramaddr = ccif.ramaddr;
+  // assign crif.ramWEN = ccif.ramWEN;
+  // assign crif.ramREN = ccif.ramREN;
 
   test PROG (CLK, nRST, ccif);
     // DUT
 `ifndef MAPPED
   memory_control DUT(CLK, nRST, ccif);
-  ram ramstuff(CLK,nRST,crif);
+  // ram ramstuff(CLK,nRST,crif);
 `else
   memory_control DUT(
     .\ccif.iREN (ccif.iREN),
@@ -56,157 +61,153 @@ module memory_control_tb;
 `endif
 
 
-
-
 endmodule
 
 
 program test(input logic CLK, output logic nRST, cache_control_if.cc ccif);
 
-
-  task automatic dump_memory();
-    string filename = "memcpu.hex";
-    int memfd;
-
-    
-    cif0.daddr = 0;
-    cif0.dWEN = 0;
-    cif0.dREN = 0;
-
-    memfd = $fopen(filename,"w");
-    if (memfd)
-      $display("Starting memory dump.");
-    else
-      begin $display("Failed to open %s.",filename); $finish; end
-
-    for (int unsigned i = 0; memfd && i < 16384; i++)
-    begin
-      int chksum = 0;
-      bit [7:0][7:0] values;
-      string ihex;
-
-      cif0.daddr = i << 2;
-      cif0.dREN = 1;
-      repeat (4) @(posedge CLK);
-      if (cif0.dload === 0)
-        continue;
-      values = {8'h04,16'(i),8'h00,cif0.dload};
-      foreach (values[j])
-        chksum += values[j];
-      chksum = 16'h100 - chksum;
-      ihex = $sformatf(":04%h00%h%h",16'(i),cif0.dload,8'(chksum));
-      $fdisplay(memfd,"%s",ihex.toupper());
-    end //for
-    if (memfd)
-    begin
-     
-      cif0.dREN = 0;
-      $fdisplay(memfd,":00000001FF");
-      $fclose(memfd);
-      $display("Finished memory dump.");
-    end
-  endtask
-
+  import cpu_types_pkg::*;
 
 initial begin
-
+  state_t expected;
 
   //reset
   nRST = 0;
-  cif0.iaddr = 0;
-  cif0.daddr = 0;
-  cif0.iREN = 0;
+  expected = IDLE;
+
+  ccif.ramload = 0;
+  ccif.ramstate = ACCESS;
+
   cif0.dWEN = 0;
   cif0.dREN = 0;
-  cif0.dstore = 32'h00000000;
-  @(negedge CLK);
-  @(negedge CLK);
+  cif0.iREN = 0;
+  cif0.dstore = '0;
+  cif0.iaddr = 32'h12341234;
+  cif0.daddr = '0;
+  cif0.ccwrite = 0;
+  cif0.cctrans = 0;
 
-  //d and i hit same time
+  cif1.dWEN = 0;
+  cif1.dREN = 0;
+  cif1.iREN = 0;
+  cif1.dstore = '0;
+  cif1.iaddr = '0;
+  cif1.daddr = '0;
+  cif1.ccwrite = 0;
+  cif1.cctrans = 0;
+
+  //instruction
+  #(10);
   nRST = 1;
-  cif0.iaddr = 32'h00000004;
-  cif0.daddr = 32'h00000004;
-  cif0.dstore = 32'h00000004;
+  #(10);
   cif0.iREN = 1;
-  cif0.dWEN = 1;
+  #(10);
+  expected = IFETCH;
+
+  //back to idle
+  #(10);
+  ccif.ramstate = FREE; 
+  cif0.iREN = 0;
+  cif0.cctrans = 0;
+  #(10);
+  expected = IDLE;
+  #(10);
+
+  //Ld ram 0 trans 1 write
+  #(10);
+  cif0.cctrans = 1;
+  #(10);
+  expected = ARB;
+  cif0.dREN = 1;
+  #(10);
+  expected = SNOOP;
+
+  cif1.ccwrite = 1;
+  cif1.cctrans = 1;
+
+  #(10);
+  expected = LDRAM1;
   cif0.dREN = 0;
-  @(negedge CLK);
-  @(negedge CLK);
 
-  //read ins
-  for (int i = 0; i < 10; i++) begin
-    cif0.iaddr = i << 2; 
-    cif0.iREN = 1'b1;
-    cif0.dWEN = 1'b0;
-    cif0.dREN = 1'b0;
-  @(negedge CLK);
-  @(negedge CLK);
-  end
-  @(negedge CLK);
-  @(negedge CLK);
-  @(negedge CLK);
+  cif0.cctrans = 0;
+  cif1.ccwrite = 0;
 
-//     //load from addr
-//   cif0.daddr = 1 << 2; 
-//   cif0.iREN = 1'b0;
-//   cif0.dWEN = 1'b0;
-//   cif0.dREN = 1'b1;
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);
- 
-// //write from addr
-//   cif0.daddr = 1 << 2; 
-//   cif0.iREN = 1'b0;
-//   cif0.dWEN = 1'b1;
-//   cif0.dREN = 1'b0;
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);
-// //load from address
-//   cif0.daddr = 1 << 2; 
-//   cif0.iREN = 1'b0;
-//   cif0.dWEN = 1'b0;
-//   cif0.dREN = 1'b1;
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);  @(negedge CLK);
-//   @(negedge CLK);
+  cif1.cctrans = 0;
+  ccif.ramstate = FREE; 
+
+  #(10);
+  expected = LDRAM2;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = IDLE;
+  #(10);
+
+  //ld cache
+  #(10);
+  cif0.cctrans = 1;
+  cif0.ccwrite = 0;
+  #(10);
+  expected = ARB;
+  cif0.dREN = 1;
+  #(10);
+  expected = SNOOP;
+
+  cif1.ccwrite = 0;
+  cif1.cctrans = 0;
+  #(10);
+  expected = LDCACHE1;
+  cif0.dREN = 0;
+  cif0.cctrans = 0;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = LDCACHE2;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = IDLE;
+  #(10);
 
 
-//   cif0.iREN = 0;
-//   cif0.iaddr = 32'h0;
+  //ld cache
+  #(10);
+  cif0.cctrans = 1;
+  cif0.ccwrite = 1;
+  #(10);
+  expected = ARB;
+  cif0.dREN = 1;
+  #(10);
+  expected = SNOOP;
 
-//   //write to mem dump mem
-//   cif0.dWEN = 1;ooo
-//   cif0.daddr = 32'h00000004;
-//   cif0.dstore = 32'h00000abc;
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   cif0.dWEN = 0;
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   @(negedge CLK);
-//   cif0.iaddr = 32'h0;
-//   cif0.daddr = 32'h0;
-//   cif0.iREN = 0;
-//   cif0.dWEN = 0;
-//   cif0.dREN = 0;
-//   @(negedge CLK);
-//   @(negedge CLK);
+  cif1.ccwrite = 0;
+  cif1.cctrans = 0;
+  #(10);
+  expected = LDCACHE1;
+  cif0.dREN = 0;
+  cif0.cctrans = 0;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = LDCACHE2;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = IDLE;
+  #(10);
 
 
 
-dump_memory();
-$finish;
+  //WB
+  #(10);
+  cif0.dWEN = 1;
+  #(10);
+  expected = WB1;
+  cif0.dWEN = 0;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = WB2;
+  ccif.ramstate = FREE; 
+  #(10);
+  expected = IDLE;
+  #(10);
+
+
 end
 
 

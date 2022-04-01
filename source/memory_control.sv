@@ -83,7 +83,7 @@ module memory_control (
         if(ccif.cctrans[~snooper])
           nextstate = LDRAM1;
         else
-          nextstate = LDCACHE1
+          nextstate = LDCACHE1;
       end
       LDRAM1: begin 
         if(ccif.ramstate == ACCESS) nextstate = LDRAM2;
@@ -118,15 +118,15 @@ always_comb begin
   ccif.ccinv[1] = ccif.ccwrite[0];
   case (state)
     IFETCH: begin
-      if(iREN[0] == 1) begin
+      if(ccif.iREN[0] == 1) begin
         ccif.ramaddr = ccif.iaddr[0];
-        ccif.ramREN = iREN[0];
+        ccif.ramREN = ccif.iREN[0];
         ccif.iwait[0] = ccif.ramstate != ACCESS;
         ccif.iload[0] = ccif.ramload;
       end
-      else if(iREN[1] == 1) begin
+      else if(ccif.iREN[1] == 1) begin
         ccif.ramaddr = ccif.iaddr[1];
-        ccif.ramREN = iREN[1];
+        ccif.ramREN = ccif.iREN[1];
         ccif.iwait[1] = ccif.ramstate != ACCESS;
         ccif.iload[1] = ccif.ramload;
       end
@@ -136,14 +136,14 @@ always_comb begin
         ccif.ramaddr = ccif.daddr[0];
         ccif.ramWEN = ccif.dWEN[0];
         ccif.ramstore = ccif.dstore[0];
-        ccif.dhit[0] = ccif.ramstate != ACCESS;
+        ccif.dwait[0] = ccif.ramstate != ACCESS;
         ccif.ccwait[1] = 1;
       end
       else if(ccif.dWEN[1]) begin
         ccif.ramaddr = ccif.daddr[1];
         ccif.ramWEN = ccif.dWEN[1];
         ccif.ramstore = ccif.dstore[1];
-        ccif.dhit[1] = ccif.ramstate != ACCESS;
+        ccif.dwait[1] = ccif.ramstate != ACCESS;
         ccif.ccwait[0] = 1;
       end
     end
@@ -152,19 +152,19 @@ always_comb begin
         ccif.ramaddr = ccif.daddr[0];
         ccif.ramWEN = ccif.dWEN[0];
         ccif.ramstore = ccif.dstore[0];
-        ccif.dhit[0] = ccif.ramstate != ACCESS;
+        ccif.dwait[0] = ccif.ramstate != ACCESS;
         ccif.ccwait[1] = 1;
       end
       else if(ccif.dWEN[1]) begin
         ccif.ramaddr = ccif.daddr[1];
         ccif.ramWEN = ccif.dWEN[1];
         ccif.ramstore = ccif.dstore[1];
-        ccif.dhit[1] = ccif.ramstate != ACCESS;
+        ccif.dwait[1] = ccif.ramstate != ACCESS;
         ccif.ccwait[0] = 1;
       end
     end
 
-    ARBITRATE: begin
+    ARB: begin
       ccif.ccwait[~next_snooper] = 1;
       ccif.ccsnoopaddr[~next_snooper] = ccif.daddr[snooper];
     end
