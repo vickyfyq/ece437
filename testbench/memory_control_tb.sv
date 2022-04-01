@@ -97,7 +97,7 @@ initial begin
   cif1.cctrans = 0;
 
   //instruction
-  #(10);
+  #(5);
   nRST = 1;
   #(10);
   cif0.iREN = 1;
@@ -109,7 +109,6 @@ initial begin
   ccif.ramstate = FREE; 
   cif0.iREN = 0;
   cif0.cctrans = 0;
-  #(10);
   expected = IDLE;
   #(10);
 
@@ -133,13 +132,14 @@ initial begin
   cif1.ccwrite = 0;
 
   cif1.cctrans = 0;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
 
   #(10);
   expected = LDRAM2;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = IDLE;
+  ccif.ramstate = FREE; 
   #(10);
 
   //ld cache
@@ -158,13 +158,15 @@ initial begin
   expected = LDCACHE1;
   cif0.dREN = 0;
   cif0.cctrans = 0;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = LDCACHE2;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = IDLE;
+  ccif.ramstate = FREE; 
   #(10);
+
 
 
   //ld cache
@@ -183,14 +185,13 @@ initial begin
   expected = LDCACHE1;
   cif0.dREN = 0;
   cif0.cctrans = 0;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = LDCACHE2;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = IDLE;
-  #(10);
-
+  ccif.ramstate = FREE; 
 
 
   //WB
@@ -199,14 +200,13 @@ initial begin
   #(10);
   expected = WB1;
   cif0.dWEN = 0;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = WB2;
-  ccif.ramstate = FREE; 
+  ccif.ramstate = ACCESS; 
   #(10);
   expected = IDLE;
-  #(10);
-
+  ccif.ramstate = FREE; 
 
 end
 
