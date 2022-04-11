@@ -312,6 +312,7 @@ case(state)
             else 
                 n_state = LD1;
         end
+        else if (cif.ccwait) n_state = TRANS;
     end
     DIRTY : begin
         if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt >= 8))
