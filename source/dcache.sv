@@ -18,9 +18,10 @@ assign daddr = dcif.dmemaddr;
 //     logic [DIDX_W-1:0]  idx;
 //     logic [DBLK_W-1:0]  blkoff;
 //     logic [DBYT_W-1:0]  bytoff;
+dcachef_t snoopaddr;
 
 typedef enum logic[3:0] {
-	IDLE, WB1, WB2, LD1, LD2, FLUSH1, FLUSH2, DIRTY, CNT, HALT
+	IDLE, WB1, WB2, LD1, LD2, FLUSH1, FLUSH2, DIRTY, CNT, HALT, TRANS, SHARE1, SHARE2, INV
 } state_t;
 state_t state, n_state;
 logic miss;
@@ -28,6 +29,15 @@ logic [7:0] hit_left, n_hit_left; //choose left or right frame
 word_t cnt, n_cnt; //hit count
 logic [4:0] frame_cnt, n_frame_cnt, frame_cnt_sub; //select each row frame
 logic [2:0] idx;
+
+///////////////////////////////snoop stuff
+logic transition; //snoop dirty 
+assign transition = 0;
+logic snoop_miss;
+assign snoopaddr = cif.ccsnoopaddr;
+logic sclefthit, sncrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
+dcache_frame scleft, scright;//snoop cache left/right frame
+assign snoop_miss = ~(n_sclefthit || n_scrighthit);
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -37,6 +47,9 @@ always_ff @(posedge CLK, negedge nRST) begin
         frame_cnt <= '0; //count each row of frame from left to right
         cnt <= '0;// count hits
         hit_left <= '0;//choose left data/right data
+        sclefthit <= '0;
+        scrighthit <= '0;
+
     end
     else begin
         left <= n_left;
@@ -45,6 +58,12 @@ always_ff @(posedge CLK, negedge nRST) begin
         frame_cnt <= n_frame_cnt;
         cnt <= n_cnt;
         hit_left <= n_hit_left;
+        sclefthit <= n_sclefthit;
+        scrighthit <= n_scrighthit;
+        if(state == TRANS || state == SHARE1 || state == INV) begin
+            left[daddr.idx] <= scleft;
+            right[daddr.idx] <= scright;
+        end
     end
 end
 
@@ -66,7 +85,54 @@ always_comb begin
     idx = 0;
     frame_cnt_sub = 0;
 
+    scright = right;
+    scleft = left;
+    n_sclefthit = sclefthit;
+    n_scrighthit = scrighthit;
     case(state)
+        TRANS: begin
+            n_sclefthit = snoopaddr.tag == left[daddr.idx].tag;
+            n_scrighthit = snoopaddr.tag == right[daddr.idx].tag;
+            transition = n_sclefthit ? left[daddr.idx].dirty : 
+                        (n_scrighthit ? right[daddr.idx].dirty:0);
+            
+            if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
+            if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+   
+        end
+        SHARE1: begin
+            if(sclefthit) begin
+                scleft.dirty = 0;
+                cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b000};
+                cif.dstore = left[snoopaddr.idx].data;
+            end 
+            else if(scrighthit) begin
+                scright.dirty = 0;
+                cif.daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b000};
+                cif.dstore = right[snoopaddr.idx].data;
+            end 
+    
+        end
+        SHARE2: begin
+            if(sclefthit) begin
+                scleft.dirty = 0;
+                cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b100};
+                cif.dstore = left[snoopaddr.idx].data;
+            end 
+            else if(scrighthit) begin
+                scright.dirty = 0;
+                cif.daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b100};
+                cif.dstore = right[snoopaddr.idx].data;
+            end 
+    
+        end
+        INV: begin
+            if(cif.ccinv && sclefthit) scleft = '0;
+            if(cif.ccinv && scrighthit) scright = '0;
+    
+        end
+ 
+
         HALT : begin
             dcif.flushed = 1;
         end
@@ -209,6 +275,34 @@ n_state = state;
 n_frame_cnt = frame_cnt;
 
 case(state)
+    TRANS: begin
+        if (cif.ccwait && transition) begin
+            n_state = SHARE1;
+            cif.cctrans = transition;
+        end
+        else if (cif.ccwait && !transition) begin
+            n_state = TRANS;
+            cif.cctrans = transition;
+        end
+        else if (cif.ccwait && snoop_miss/*       */) begin
+            //hit neither left or right
+            n_state = TRANS;
+        end
+        else if(!cif.ccwait) n_state = IDLE;
+
+    end
+    SHARE1: begin
+        if (!cif.dwait) n_state = SHARE2;
+
+    end
+    SHARE2: begin
+        if (!cif.dwait) n_state = INV;
+
+    end
+    INV: begin
+        n_state = IDLE;
+
+    end
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
         else if (miss) begin
