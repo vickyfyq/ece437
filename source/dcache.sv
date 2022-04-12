@@ -38,6 +38,7 @@ assign snoopaddr = cif.ccsnoopaddr;
 logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
+assign cif.ccwrite = dcif.dmemWEN;
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -84,6 +85,7 @@ always_comb begin
     n_cnt = cnt;
     idx = 0;
     frame_cnt_sub = 0;
+    transition = 0;
 
     scright = right;
     scleft = left;
@@ -92,11 +94,11 @@ always_comb begin
     transition = 0;
     case(state)
         TRANS: begin
-            n_sclefthit = snoopaddr.tag == left[daddr.idx].tag;
-            n_scrighthit = snoopaddr.tag == right[daddr.idx].tag;
-            transition = n_sclefthit ? left[daddr.idx].dirty : 
-                        (n_scrighthit ? right[daddr.idx].dirty:0);
-            
+            n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
+            n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
+            transition = n_sclefthit ? left[snoopaddr.idx].dirty : 
+                        (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
+
             if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
             if(cif.ccinv && !transition && n_scrighthit) scright = '0;
    
@@ -270,6 +272,7 @@ end
 always_comb begin
 n_state = state;
 n_frame_cnt = frame_cnt;
+cif.cctrans = 0;
 
 case(state)
     TRANS: begin
@@ -302,14 +305,18 @@ case(state)
     end
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
-        else if (miss) begin
-            if((hit_left[daddr.idx] == 0 && left[daddr.idx].dirty) || (hit_left[daddr.idx] && right[daddr.idx].dirty)) 
-            //left frame or right frame dirty
-                n_state = WB1;
-            else 
-                n_state = LD1;
-        end
         else if (cif.ccwait) n_state = TRANS;
+        else if (miss) begin
+            if(hit_left[daddr.idx] == 0) begin
+            //left frame or right frame dirty
+                n_state = left[daddr.idx].dirty ? WB1 : LD1;
+                cif.cctrans = ~left[daddr.idx].dirty;
+            end
+            else begin
+                n_state = right[daddr.idx].dirty ? WB1 : LD1;
+                cif.cctrans = ~right[daddr.idx].dirty;
+            end
+        end
     end
     DIRTY : begin
         if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt >= 8))
@@ -330,6 +337,8 @@ case(state)
     end 
     LD1: begin
         if (!cif.dwait) n_state = LD2;
+        if (cif.ccwait) n_state = TRANS;
+        cif.cctrans = ~cif.ccwait;
     end
     LD2: begin
         if (!cif.dwait) n_state = IDLE;

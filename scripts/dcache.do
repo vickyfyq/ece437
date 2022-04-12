@@ -4,12 +4,17 @@ add wave -noupdate -radix decimal /dcache_tb/PROG/test_num
 add wave -noupdate /dcache_tb/CLK
 add wave -noupdate /dcache_tb/nRST
 add wave -noupdate /dcache_tb/DUT/state
-add wave -noupdate -expand -group cif /dcache_tb/cif/dwait
-add wave -noupdate -expand -group cif /dcache_tb/cif/dREN
-add wave -noupdate -expand -group cif /dcache_tb/cif/dWEN
-add wave -noupdate -expand -group cif /dcache_tb/cif/dload
-add wave -noupdate -expand -group cif /dcache_tb/cif/dstore
-add wave -noupdate -expand -group cif /dcache_tb/cif/daddr
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dwait
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dREN
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dWEN
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dload
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dstore
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/daddr
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccwait
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccinv
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccwrite
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/cctrans
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccsnoopaddr
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/halt
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dhit
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/datomic
@@ -18,15 +23,20 @@ add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemWEN
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemload
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemstore
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemaddr
-add wave -noupdate -expand /dcache_tb/DUT/left
+add wave -noupdate /dcache_tb/DUT/left
 add wave -noupdate /dcache_tb/DUT/right
 add wave -noupdate /dcache_tb/DUT/n_left
 add wave -noupdate /dcache_tb/DUT/n_right
 add wave -noupdate /dcache_tb/DUT/daddr
 add wave -noupdate /dcache_tb/PROG/i
 add wave -noupdate /dcache_tb/DUT/miss
+add wave -noupdate /dcache_tb/DUT/n_sclefthit
+add wave -noupdate /dcache_tb/DUT/n_scrighthit
+add wave -noupdate /dcache_tb/DUT/sclefthit
+add wave -noupdate /dcache_tb/DUT/scrighthit
+add wave -noupdate /dcache_tb/DUT/snoopaddr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {342 ns} 0}
+WaveRestoreCursors {{Cursor 1} {1129 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 217
@@ -42,4 +52,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {305 ns} {375 ns}
+WaveRestoreZoom {1090 ns} {1160 ns}

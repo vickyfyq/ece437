@@ -322,59 +322,46 @@ initial begin
           done = 1;
       end
 	end
-  
-  dcache_tb.dcif.imemaddr = '0;
-  dcache_tb.dcif.halt = 0;
-  dcache_tb.dcif.imemREN = 1;
-  dcache_tb.dcif.dmemREN = 0;
-  dcache_tb.dcif.dmemWEN = 0;
-  dcache_tb.dcif.datomic = 0;
-  dcache_tb.dcif.dmemstore = 0;
-  dcache_tb.dcif.dmemaddr = 0;
-  dcache_tb.dcif.imemaddr = 0;
-  dcache_tb.cif.dwait = 1;
-  dcache_tb.cif.dload = 0;
-  dcache_tb.cif.ccwait = 0;
-  dcache_tb.cif.ccinv = 0;
-  dcache_tb.cif.ccsnoopaddr = 0;
-  dcache_tb.cif.iwait = 1;
-  dcache_tb.cif.iload = 0;
+
+  dcif.imemaddr = '0;
+  dcif.halt = 0;
+  dcif.imemREN = 1;
+  dcif.dmemREN = 0;
+  dcif.dmemWEN = 0;
+  dcif.datomic = 0;
+  dcif.dmemstore = 0;
+  dcif.dmemaddr = 0;
+  dcif.imemaddr = 0;
+  cif.dwait = 1;
+  cif.dload = 0;
+  cif.ccwait = 0;
+  cif.ccinv = 0;
+  cif.ccsnoopaddr = 0;
+  cif.iwait = 1;
+  cif.iload = 0;
   #(20);
 
   //Snoop No share
   test_num += 1;
-  dcache_tb.cif.ccwait = 1;
-  dcache_tb.cif.ccinv = 1;
+  cif.ccwait = 1;
+  cif.ccinv = 1;
   #(20);
-  dcache_tb.cif.ccinv = 0;
+  cif.ccinv = 0;
   #(20);
-  dcache_tb.cif.ccwait = 0;
+  cif.ccwait = 0;
   #(20);
 
   //Snoop Share and INV
   test_num += 1;
-  dcache_tb.cif.ccwait = 1;
-  dcache_tb.cif.ccinv = 1;
-  dcache_tb.cif.dwait = 1;
+  cif.ccwait = 1;
+  cif.ccinv = 1;
+  cif.dwait = 1;
   #(20);
-  dcache_tb.cif.ccsnoopaddr = {26'h204, 3'b001, 3'b000};
+  cif.ccsnoopaddr = {26'h200, i[2:0], 3'b000};
   #(20);
-  dcache_tb.cif.dwait = 0;
+  cif.dwait = 0;
   #(20);
-  dcache_tb.cif.ccwait = 0;
-  #(20);
-
   //Snoop Share no INV
-  test_num += 1;
-  dcache_tb.cif.ccwait = 1;
-  dcache_tb.cif.dwait = 1;
-  #(20);
-  dcache_tb.cif.ccsnoopaddr = {26'h204, 3'b000, 3'b000};
-  #(20);
-  dcache_tb.cif.dwait = 0;
-  #(20);
-  dcache_tb.cif.ccwait = 0;
-  #(20);
 
   dcache_tb.cif.dwait = 1;
   dcache_tb.dcif.halt = 1;
