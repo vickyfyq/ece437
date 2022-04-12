@@ -101,14 +101,14 @@ always_comb begin
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
            
 
-            if (cif.ccwait && snoop_dirty ) begin
+            if (cif.ccinv && snoop_dirty ) begin
                 cif.cctrans = 1;
                 cif.ccwrite = 1;
                 if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
                 if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
             //not dirty
-            else if (cif.ccwait && !snoop_dirty) begin
+            else if (cif.ccinv && !snoop_dirty) begin
                 cif.cctrans = 1;
                 cif.ccwrite = 0;
                 if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
@@ -296,11 +296,11 @@ case(state)
         //valid and dirty M->S  go to SHARE1
         //invalid and dirty M->I go to SHARE1
         //invalid and not dirty S -> I to back to idle
-        if (cif.ccwait && snoop_dirty ) begin
+        if (cif.ccinv && snoop_dirty ) begin
             n_state = SHARE1;
         end
         //not dirty
-        else if (cif.ccwait && !snoop_dirty) begin
+        else if (cif.ccinv && !snoop_dirty) begin
             n_state = IDLE;
         end
         else n_state = IDLE;
