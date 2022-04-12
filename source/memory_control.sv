@@ -23,13 +23,13 @@ module memory_control (
   parameter CPUS = 2;
 
   typedef enum logic[3:0] {
-    IDLE, WB1, WB2, IFETCH, ARB, LDRAM1, LDRAM2, LDCACHE1, LDCACHE2, SNOOP
+    IDLE, WB1, WB2, IFETCH, ARB, LDRAM1, LDRAM2, RAMCACHE1, RAMCACHE2, SNOOP
   } state_t;
 
   state_t state, nextstate;
   logic snooper, next_snooper;
-  logic  [CPUS-1:0] next_ccwait, next_ccinv;
-  word_t [CPUS-1:0] next_ccsnoopaddr;
+  //logic  [CPUS-1:0] next_ccwait, next_ccinv;
+  //word_t [CPUS-1:0] next_ccsnoopaddr;
 
   always_ff @ (posedge CLK, negedge nRST) begin
     if(nRST == 0) begin
@@ -81,9 +81,9 @@ module memory_control (
       end
       SNOOP: begin
         if(ccif.cctrans[~snooper])
-          nextstate = LDRAM1;
+          nextstate = RAMCACHE1;
         else
-          nextstate = LDCACHE1;
+          nextstate = LDRAM1;
       end
       LDRAM1: begin 
         if(ccif.ramstate == ACCESS) nextstate = LDRAM2;
@@ -91,10 +91,10 @@ module memory_control (
       LDRAM2: begin 
         if(ccif.ramstate == ACCESS) nextstate = IDLE;
       end
-      LDCACHE1: begin 
-        if(ccif.ramstate == ACCESS) nextstate = LDCACHE2;
+      RAMCACHE1: begin 
+        if(ccif.ramstate == ACCESS) nextstate = RAMCACHE1;
       end
-      LDCACHE2: begin 
+      RAMCACHE2: begin 
         if(ccif.ramstate == ACCESS) nextstate = IDLE;
       end 
     endcase 
@@ -190,7 +190,7 @@ always_comb begin
       ccif.ccwait[~snooper] = 1;
     end
 
-    LDCACHE1: begin
+    RAMCACHE1: begin
       ccif.dwait[snooper] = ccif.ramstate != ACCESS;
       ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
       ccif.dload[snooper] = ccif.dstore[~snooper];
@@ -201,7 +201,7 @@ always_comb begin
       ccif.ccsnoopaddr = ccif.daddr[snooper];
     end
 
-    LDCACHE2: begin
+    RAMCACHE1: begin
       ccif.dwait[snooper] = ccif.ramstate != ACCESS;
       ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
       ccif.dload[snooper] = ccif.dstore[~snooper];

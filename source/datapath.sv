@@ -168,13 +168,13 @@ module datapath (
 
   //pc register
   always_ff@ (posedge CLK, negedge nRST) begin
-    if(!nRST)  pc<= 32'b0;
+    if(!nRST)  pc<= PC_INIT;
     else if(dcif.ihit&!dcif.dhit) pc <= npc;
   end
 
   //datapath output
   assign dcif.halt = halt;
-  assign dcif.imemREN = 1;
+  assign dcif.imemREN = ~dcif.dmemREN && ~dcif.dmemWEN;
   assign dcif.dmemREN = prif.mem.MemtoReg; 
   assign dcif.dmemWEN = prif.mem.MemWr; 
   assign dcif.dmemstore = prif.mem.rdat2;

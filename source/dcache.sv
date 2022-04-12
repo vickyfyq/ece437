@@ -97,7 +97,7 @@ always_comb begin
             n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
             transition = n_sclefthit ? left[snoopaddr.idx].dirty : 
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
-            
+
             if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
             if(cif.ccinv && !transition && n_scrighthit) scright = '0;
    
@@ -310,11 +310,15 @@ case(state)
         if(dcif.halt) n_state = DIRTY;
         else if (cif.ccwait) n_state = TRANS;
         else if (miss) begin
-            if((hit_left[daddr.idx] == 0 && left[daddr.idx].dirty) || (hit_left[daddr.idx] && right[daddr.idx].dirty)) 
+            if(hit_left[daddr.idx] == 0) begin
             //left frame or right frame dirty
-                n_state = WB1;
-            else 
-                n_state = LD1;
+                n_state = left[daddr.idx].dirty ? WB1 : LD1;
+                cif.cctrans = ~left[daddr.idx].dirty;
+            end
+            else begin
+                n_state = right[daddr.idx].dirty ? WB1 : LD1;
+                cif.cctrans = ~right[daddr.idx].dirty;
+            end
         end
     end
     DIRTY : begin
@@ -336,6 +340,8 @@ case(state)
     end 
     LD1: begin
         if (!cif.dwait) n_state = LD2;
+        if (cif.ccwait) n_state = TRANS;
+        cif.cctrans = ~cif.ccwait;
     end
     LD2: begin
         if (!cif.dwait) n_state = IDLE;
