@@ -21,7 +21,7 @@ assign daddr = dcif.dmemaddr;
 dcachef_t snoopaddr;
 
 typedef enum logic[3:0] {
-	IDLE, WB1, WB2, LD1, LD2, FLUSH1, FLUSH2, DIRTY, CNT, HALT, TRANS, SHARE1, SHARE2, INV
+	IDLE, WB1, WB2, LD1, LD2, FLUSH1, FLUSH2, DIRTY, CNT, HALT, TRANS, SHARE1, SHARE2
 } state_t;
 state_t state, n_state;
 logic miss;
@@ -98,12 +98,25 @@ always_comb begin
             n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
             transition = n_sclefthit ? left[snoopaddr.idx].dirty : 
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
+           
 
-            if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
-            if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+            if (cif.ccwait && transition ) begin
+                cif.cctrans = 1;
+                cif.ccwrite = 1;
+                if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
+                if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+            end
+            //not dirty
+            else if (cif.ccwait && !transition) begin
+                cif.cctrans = 1;
+                cif.ccwrite = 0;
+                if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
+                if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+            end
    
         end
         SHARE1: begin
+            cif.dWEN = 1;
             if(sclefthit) begin
                 scleft.dirty = 0;
                 cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b000};
@@ -117,6 +130,7 @@ always_comb begin
     
         end
         SHARE2: begin
+            cif.dWEN = 1;
             if(sclefthit) begin
                 scleft.dirty = 0;
                 cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b100};
@@ -129,12 +143,6 @@ always_comb begin
             end 
     
         end
-        INV: begin
-            if(cif.ccinv && sclefthit) scleft = '0;
-            if(cif.ccinv && scrighthit) scright = '0;
-    
-        end
- 
 
         HALT : begin
             dcif.flushed = 1;
@@ -145,6 +153,7 @@ always_comb begin
 			cif.dstore = cnt; 
 		end   
         FLUSH1 : begin
+            cif.cctrans = 1;
             cif.dWEN = 1;
             //cif.daddr = ((frame_cnt - 1) < 8) ? {left[frame_cnt -1].tag, frame_cnt -1, 3'b000}:{right[frame_cnt-8].tag, frame_cnt-8, 3'b000};
             //cif.dstore = ((frame_cnt - 1) > 8) ? right[frame_cnt-8].data[0] : left[frame_cnt-1].data[0];
@@ -163,6 +172,7 @@ always_comb begin
             end
         end    
         FLUSH2 : begin
+            cif.cctrans = 1;
             cif.dWEN = 1;
             //cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b100}:{right[daddr.idx].tag, frame_cnt-8, 3'b100};
             //cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
@@ -181,18 +191,24 @@ always_comb begin
         end  
         LD2: begin
             cif.dREN = 1;
+            cif.cctrans = 1;
             cif.daddr = {daddr.tag,daddr.idx,3'b100};
             if (hit_left[daddr.idx]) begin
-                n_right[daddr.idx].data[1] = cif.dload;  if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
-                if(cif.ccinv && !transition && n_scrighthit) scright = '0;
-       
+                n_right[daddr.idx].data[1] = cif.dload;
+                n_right[daddr.idx].tag = daddr.tag;
+                n_right[daddr.idx].dirty = 0;
+                n_right[daddr.idx].valid = 1;
+            end   
+            else begin
+                n_left[daddr.idx].data[1] = cif.dload;
                 n_left[daddr.idx].tag = daddr.tag;
                 n_left[daddr.idx].dirty = 0;
                 n_left[daddr.idx].valid = 1;
-            end   
+            end    
         end
         LD1: begin
             cif.dREN = 1;
+            cif.cctrans = 1;
             cif.daddr = {daddr.tag,daddr.idx,3'h0};
             if (hit_left[daddr.idx])    n_right[daddr.idx].data[0] = cif.dload;
             else    n_left[daddr.idx].data[0] = cif.dload;
@@ -276,19 +292,17 @@ cif.cctrans = 0;
 
 case(state)
     TRANS: begin
-        if (cif.ccwait && transition) begin
+        //valid and dirty M->S  go to SHARE1
+        //invalid and dirty M->I go to SHARE1
+        //invalid and not dirty S -> I to back to idle
+        if (cif.ccwait && transition ) begin
             n_state = SHARE1;
-            cif.cctrans = transition;
         end
+        //not dirty
         else if (cif.ccwait && !transition) begin
-            n_state = TRANS;
-            cif.cctrans = transition;
+            n_state = IDLE;
         end
-        else if (cif.ccwait && snoop_miss/*       */) begin
-            //hit neither left or right
-            n_state = TRANS;
-        end
-        else if(!cif.ccwait) n_state = IDLE;
+        else n_state = IDLE;
 
     end
     SHARE1: begin
@@ -296,13 +310,10 @@ case(state)
 
     end
     SHARE2: begin
-        if (!cif.dwait) n_state = INV;
+        if (!cif.dwait) n_state = IDLE;
 
     end
-    INV: begin
-        n_state = IDLE;
 
-    end
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
         else if (cif.ccwait) n_state = TRANS;
@@ -310,11 +321,11 @@ case(state)
             if(hit_left[daddr.idx] == 0) begin
             //left frame or right frame dirty
                 n_state = left[daddr.idx].dirty ? WB1 : LD1;
-                cif.cctrans = ~left[daddr.idx].dirty;
+            
             end
             else begin
                 n_state = right[daddr.idx].dirty ? WB1 : LD1;
-                cif.cctrans = ~right[daddr.idx].dirty;
+              
             end
         end
     end
@@ -324,7 +335,7 @@ case(state)
                 n_state = FLUSH1;
         n_frame_cnt = frame_cnt + 1;
         if(frame_cnt == 16) //if went through all the frames, hit cnt +1
-            n_state = CNT;
+            n_state = HALT;
     end
     CNT : begin
         if (!cif.dwait) n_state = HALT;
