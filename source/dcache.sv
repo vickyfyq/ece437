@@ -38,6 +38,7 @@ assign snoopaddr = cif.ccsnoopaddr;
 logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
+assign cif.ccwrite = dcif.dmemWEN;
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -274,6 +275,7 @@ end
 always_comb begin
 n_state = state;
 n_frame_cnt = frame_cnt;
+cif.cctrans = 0;
 
 case(state)
     TRANS: begin
@@ -306,6 +308,7 @@ case(state)
     end
     IDLE: begin
         if(dcif.halt) n_state = DIRTY;
+        else if (cif.ccwait) n_state = TRANS;
         else if (miss) begin
             if((hit_left[daddr.idx] == 0 && left[daddr.idx].dirty) || (hit_left[daddr.idx] && right[daddr.idx].dirty)) 
             //left frame or right frame dirty
@@ -313,7 +316,6 @@ case(state)
             else 
                 n_state = LD1;
         end
-        else if (cif.ccwait) n_state = TRANS;
     end
     DIRTY : begin
         if((left[frame_cnt[2:0]].dirty && frame_cnt < 8) || (right[frame_cnt[2:0]].dirty&& frame_cnt >= 8))
