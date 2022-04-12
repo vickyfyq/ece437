@@ -357,9 +357,11 @@ initial begin
   dcache_tb.cif.ccinv = 1;
   dcache_tb.cif.dwait = 1;
   #(20);
-  dcache_tb.cif.ccsnoopaddr = {26'h200, 3'b000, 3'b000};
+  dcache_tb.cif.ccsnoopaddr = {26'h204, 3'b001, 3'b000};
   #(20);
   dcache_tb.cif.dwait = 0;
+  #(20);
+  dcache_tb.cif.ccwait = 0;
   #(20);
 
   //Snoop Share no INV
@@ -367,9 +369,11 @@ initial begin
   dcache_tb.cif.ccwait = 1;
   dcache_tb.cif.dwait = 1;
   #(20);
-  dcache_tb.cif.ccsnoopaddr = {26'h200, 3'b000, 3'b000};
+  dcache_tb.cif.ccsnoopaddr = {26'h204, 3'b000, 3'b000};
   #(20);
   dcache_tb.cif.dwait = 0;
+  #(20);
+  dcache_tb.cif.ccwait = 0;
   #(20);
 
   dcache_tb.cif.dwait = 1;

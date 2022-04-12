@@ -23,15 +23,20 @@ add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemWEN
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemload
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemstore
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dmemaddr
-add wave -noupdate -expand /dcache_tb/DUT/left
+add wave -noupdate /dcache_tb/DUT/left
 add wave -noupdate /dcache_tb/DUT/right
 add wave -noupdate /dcache_tb/DUT/n_left
 add wave -noupdate /dcache_tb/DUT/n_right
 add wave -noupdate /dcache_tb/DUT/daddr
 add wave -noupdate /dcache_tb/PROG/i
 add wave -noupdate /dcache_tb/DUT/miss
+add wave -noupdate /dcache_tb/DUT/n_sclefthit
+add wave -noupdate /dcache_tb/DUT/n_scrighthit
+add wave -noupdate /dcache_tb/DUT/sclefthit
+add wave -noupdate /dcache_tb/DUT/scrighthit
+add wave -noupdate /dcache_tb/DUT/snoopaddr
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {342 ns} 0}
+WaveRestoreCursors {{Cursor 1} {1129 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 217
@@ -47,4 +52,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {6169 ns} {6239 ns}
+WaveRestoreZoom {1090 ns} {1160 ns}

@@ -92,10 +92,10 @@ always_comb begin
     n_scrighthit = scrighthit;
     case(state)
         TRANS: begin
-            n_sclefthit = snoopaddr.tag == left[daddr.idx].tag;
-            n_scrighthit = snoopaddr.tag == right[daddr.idx].tag;
-            transition = n_sclefthit ? left[daddr.idx].dirty : 
-                        (n_scrighthit ? right[daddr.idx].dirty:1'b0);
+            n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
+            n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
+            transition = n_sclefthit ? left[snoopaddr.idx].dirty : 
+                        (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
             
             if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
             if(cif.ccinv && !transition && n_scrighthit) scright = '0;
