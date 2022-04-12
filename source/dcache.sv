@@ -31,14 +31,14 @@ logic [4:0] frame_cnt, n_frame_cnt, frame_cnt_sub; //select each row frame
 logic [2:0] idx;
 
 ///////////////////////////////snoop stuff
-logic transition; //snoop dirty 
-//assign transition = 0;
+logic snoop_dirty; //snoop dirty 
+//assign snoop_dirty = 0;
 logic snoop_miss;
 assign snoopaddr = cif.ccsnoopaddr;
 logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
-assign cif.ccwrite = dcif.dmemWEN;
+//assign cif.ccwrite = dcif.dmemWEN;
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -61,7 +61,7 @@ always_ff @(posedge CLK, negedge nRST) begin
         hit_left <= n_hit_left;
         sclefthit <= n_sclefthit;
         scrighthit <= n_scrighthit;
-        if(state == TRANS || state == SHARE1 || state == INV) begin
+        if(state == TRANS || state == SHARE1 ) begin
             left[daddr.idx] <= scleft;
             right[daddr.idx] <= scright;
         end
@@ -85,33 +85,34 @@ always_comb begin
     n_cnt = cnt;
     idx = 0;
     frame_cnt_sub = 0;
-    transition = 0;
-
+    snoop_dirty = 0;
+    cif.ccwrite = 0;
     scright = right;
     scleft = left;
     n_sclefthit = sclefthit;
     n_scrighthit = scrighthit;
-    transition = 0;
+    snoop_dirty = 0;
+    cif.cctrans = 0;
     case(state)
         TRANS: begin
             n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
             n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
-            transition = n_sclefthit ? left[snoopaddr.idx].dirty : 
+            snoop_dirty = n_sclefthit ? left[snoopaddr.idx].dirty : 
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
            
 
-            if (cif.ccwait && transition ) begin
+            if (cif.ccwait && snoop_dirty ) begin
                 cif.cctrans = 1;
                 cif.ccwrite = 1;
-                if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
-                if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+                if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
+                if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
             //not dirty
-            else if (cif.ccwait && !transition) begin
+            else if (cif.ccwait && !snoop_dirty) begin
                 cif.cctrans = 1;
                 cif.ccwrite = 0;
-                if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
-                if(cif.ccinv && !transition && n_scrighthit) scright = '0;
+                if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
+                if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
    
         end
@@ -288,18 +289,18 @@ end
 always_comb begin
 n_state = state;
 n_frame_cnt = frame_cnt;
-cif.cctrans = 0;
+
 
 case(state)
     TRANS: begin
         //valid and dirty M->S  go to SHARE1
         //invalid and dirty M->I go to SHARE1
         //invalid and not dirty S -> I to back to idle
-        if (cif.ccwait && transition ) begin
+        if (cif.ccwait && snoop_dirty ) begin
             n_state = SHARE1;
         end
         //not dirty
-        else if (cif.ccwait && !transition) begin
+        else if (cif.ccwait && !snoop_dirty) begin
             n_state = IDLE;
         end
         else n_state = IDLE;
@@ -349,7 +350,7 @@ case(state)
     LD1: begin
         if (!cif.dwait) n_state = LD2;
         if (cif.ccwait) n_state = TRANS;
-        cif.cctrans = ~cif.ccwait;
+        
     end
     LD2: begin
         if (!cif.dwait) n_state = IDLE;
