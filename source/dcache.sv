@@ -32,10 +32,10 @@ logic [2:0] idx;
 
 ///////////////////////////////snoop stuff
 logic transition; //snoop dirty 
-assign transition = 0;
+//assign transition = 0;
 logic snoop_miss;
 assign snoopaddr = cif.ccsnoopaddr;
-logic sclefthit, sncrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
+logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
 
@@ -84,6 +84,7 @@ always_comb begin
     n_cnt = cnt;
     idx = 0;
     frame_cnt_sub = 0;
+    transition = 0;
 
     scright = right;
     scleft = left;
@@ -94,7 +95,7 @@ always_comb begin
             n_sclefthit = snoopaddr.tag == left[daddr.idx].tag;
             n_scrighthit = snoopaddr.tag == right[daddr.idx].tag;
             transition = n_sclefthit ? left[daddr.idx].dirty : 
-                        (n_scrighthit ? right[daddr.idx].dirty:0);
+                        (n_scrighthit ? right[daddr.idx].dirty:1'b0);
             
             if(cif.ccinv && !transition && n_sclefthit) scleft = '0;
             if(cif.ccinv && !transition && n_scrighthit) scright = '0;

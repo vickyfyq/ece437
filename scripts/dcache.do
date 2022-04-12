@@ -4,12 +4,17 @@ add wave -noupdate -radix decimal /dcache_tb/PROG/test_num
 add wave -noupdate /dcache_tb/CLK
 add wave -noupdate /dcache_tb/nRST
 add wave -noupdate /dcache_tb/DUT/state
-add wave -noupdate -expand -group cif /dcache_tb/cif/dwait
-add wave -noupdate -expand -group cif /dcache_tb/cif/dREN
-add wave -noupdate -expand -group cif /dcache_tb/cif/dWEN
-add wave -noupdate -expand -group cif /dcache_tb/cif/dload
-add wave -noupdate -expand -group cif /dcache_tb/cif/dstore
-add wave -noupdate -expand -group cif /dcache_tb/cif/daddr
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dwait
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dREN
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dWEN
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dload
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/dstore
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/daddr
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccwait
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccinv
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccwrite
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/cctrans
+add wave -noupdate -expand -group cif /dcache_tb/DUT/cif/ccsnoopaddr
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/halt
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/dhit
 add wave -noupdate -expand -group dcif /dcache_tb/dcif/datomic
@@ -42,4 +47,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {305 ns} {375 ns}
+WaveRestoreZoom {6169 ns} {6239 ns}
