@@ -194,22 +194,22 @@ always_comb begin
       ccif.dwait[snooper] = ccif.ramstate != ACCESS;
       ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
       ccif.dload[snooper] = ccif.dstore[~snooper];
-      ccif.ramaddr = ccif.daddr[~snooper];
+      ccif.ramaddr = ccif.daddr[snooper];
       ccif.ramstore = ccif.dstore[~snooper];
       ccif.ramWEN = 1;
       ccif.ccwait[~snooper] = 1;
-      ccif.ccsnoopaddr = ccif.daddr[snooper];
+      ccif.ccsnoopaddr[~snooper] = ccif.daddr[snooper];
     end
 
     RAMCACHE2: begin
       ccif.dwait[snooper] = ccif.ramstate != ACCESS;
       ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
       ccif.dload[snooper] = ccif.dstore[~snooper];
-      ccif.ramaddr = ccif.daddr[~snooper];
+      ccif.ramaddr = ccif.daddr[snooper];
       ccif.ramstore = ccif.dstore[~snooper];
       ccif.ramWEN = 1;
       ccif.ccwait[~snooper] = 1;
-      ccif.ccsnoopaddr = ccif.daddr[snooper];
+      ccif.ccsnoopaddr[~snooper] = ccif.daddr[snooper];
     end
   endcase
 

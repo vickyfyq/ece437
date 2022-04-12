@@ -38,7 +38,7 @@ assign snoopaddr = cif.ccsnoopaddr;
 logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
-//assign cif.ccwrite = dcif.dmemWEN;
+assign cif.ccwrite = dcif.dmemWEN;
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -86,7 +86,7 @@ always_comb begin
     idx = 0;
     frame_cnt_sub = 0;
     snoop_dirty = 0;
-    cif.ccwrite = 0;
+    //cif.ccwrite = 0;
     scright = right;
     scleft = left;
     n_sclefthit = sclefthit;
@@ -103,14 +103,14 @@ always_comb begin
 
             if (cif.ccinv && snoop_dirty ) begin
                 cif.cctrans = 1;
-                cif.ccwrite = 1;
+                //cif.ccwrite = 1;
                 if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
                 if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
             //not dirty
             else if (cif.ccinv && !snoop_dirty) begin
                 cif.cctrans = 1;
-                cif.ccwrite = 0;
+                //cif.ccwrite = 0;
                 if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
                 if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
