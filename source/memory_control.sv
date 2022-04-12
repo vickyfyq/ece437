@@ -92,7 +92,7 @@ module memory_control (
         if(ccif.ramstate == ACCESS) nextstate = IDLE;
       end
       RAMCACHE1: begin 
-        if(ccif.ramstate == ACCESS) nextstate = RAMCACHE1;
+        if(ccif.ramstate == ACCESS) nextstate = RAMCACHE2;
       end
       RAMCACHE2: begin 
         if(ccif.ramstate == ACCESS) nextstate = IDLE;
@@ -201,7 +201,7 @@ always_comb begin
       ccif.ccsnoopaddr = ccif.daddr[snooper];
     end
 
-    RAMCACHE1: begin
+    RAMCACHE2: begin
       ccif.dwait[snooper] = ccif.ramstate != ACCESS;
       ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
       ccif.dload[snooper] = ccif.dstore[~snooper];
