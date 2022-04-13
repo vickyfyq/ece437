@@ -86,7 +86,12 @@ module memory_control (
           nextstate = LDRAM1;
       end
       LDRAM1: begin 
-        if(ccif.ramstate == ACCESS) nextstate = LDRAM2;
+        if(ccif.ramstate == ACCESS) begin
+          if(ccif.cctrans[~snooper])
+            nextstate = RAMCACHE2;
+          else
+            nextstate = LDRAM2;
+        end
       end
       LDRAM2: begin 
         if(ccif.ramstate == ACCESS) nextstate = IDLE;
@@ -180,6 +185,16 @@ always_comb begin
       ccif.ramaddr = ccif.daddr[snooper];
       ccif.ramREN = ccif.dREN[snooper];
       ccif.ccwait[~snooper] = 1;
+      if(ccif.cctrans[~snooper]) begin
+        ccif.dwait[snooper] = ccif.ramstate != ACCESS;
+        ccif.dwait[~snooper] = ccif.ramstate != ACCESS;
+        ccif.dload[snooper] = ccif.dstore[~snooper];
+        ccif.ramaddr = ccif.daddr[snooper];
+        ccif.ramstore = ccif.dstore[~snooper];
+        ccif.ramWEN = 1;
+        ccif.ccwait[~snooper] = 1;
+        ccif.ccsnoopaddr[~snooper] = ccif.daddr[snooper];
+      end
     end
 
     LDRAM2: begin

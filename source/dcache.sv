@@ -38,7 +38,7 @@ assign snoopaddr = cif.ccsnoopaddr;
 logic sclefthit, scrighthit, n_sclefthit, n_scrighthit;//snoop cache left/right hit
 dcache_frame scleft, scright;//snoop cache left/right frame
 assign snoop_miss = ~(n_sclefthit || n_scrighthit);
-assign cif.ccwrite = dcif.dmemWEN;
+
 
 always_ff @(posedge CLK, negedge nRST) begin
     if (!nRST) begin
@@ -93,6 +93,7 @@ always_comb begin
     n_scrighthit = scrighthit;
     snoop_dirty = 0;
     cif.cctrans = 0;
+    cif.ccwrite = dcif.dmemWEN;
     case(state)
         TRANS: begin
             n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
@@ -104,16 +105,20 @@ always_comb begin
             if (cif.ccinv && snoop_dirty ) begin
                 cif.cctrans = 1;
                 //cif.ccwrite = 1;
-                if(n_sclefthit && !snoop_dirty && n_sclefthit) scleft.valid = 0;
-                if(n_scrighthit && !snoop_dirty && n_sclefthit) scright.valid = 0;
+                if(n_sclefthit) scleft.valid = 0;
+                if(n_scrighthit) scright.valid = 0;
+                if(n_sclefthit) scleft.dirty = '0;
+                if(n_scrighthit) scright.dirty= '0;
             end
             //not dirty
             
             else if (cif.ccinv && !snoop_dirty) begin
+
                 cif.cctrans = 1;
                 //cif.ccwrite = 0;
-                if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft.valid = 0;
-                if(cif.ccinv && !snoop_dirty && n_scrighthit) scright.valid = 0;
+                if(n_sclefthit) scleft.valid = '0;
+                if(n_scrighthit) scright.valid = '0;
+         
             end
             
    
@@ -158,13 +163,10 @@ always_comb begin
         FLUSH1 : begin
             cif.cctrans = 1;
             cif.dWEN = 1;
-            //cif.daddr = ((frame_cnt - 1) < 8) ? {left[frame_cnt -1].tag, frame_cnt -1, 3'b000}:{right[frame_cnt-8].tag, frame_cnt-8, 3'b000};
-            //cif.dstore = ((frame_cnt - 1) > 8) ? right[frame_cnt-8].data[0] : left[frame_cnt-1].data[0];
             if(frame_cnt - 1 < 8) begin
                 frame_cnt_sub = frame_cnt - 1;
                 idx = frame_cnt_sub[2:0];
                 cif.daddr = {left[idx].tag, idx, 3'b000};
-                //cif.daddr = {left[frame_cnt -1].tag, frame_cnt -1, 3'b000};
                 cif.dstore = left[idx].data[0];
             end
             else begin
@@ -177,8 +179,6 @@ always_comb begin
         FLUSH2 : begin
             cif.cctrans = 1;
             cif.dWEN = 1;
-            //cif.daddr = ((frame_cnt - 1) < 8) ? {left[daddr.idx].tag, frame_cnt -1, 3'b100}:{right[daddr.idx].tag, frame_cnt-8, 3'b100};
-            //cif.dstore = ((frame_cnt - 1) > 8) ? right[daddr.idx].data[1] : left[daddr.idx].data[1];
             if(frame_cnt - 1 < 8) begin
                 frame_cnt_sub = frame_cnt - 1;
                 idx = frame_cnt_sub[2:0];
@@ -233,12 +233,14 @@ always_comb begin
                     n_hit_left[daddr.idx] = 1; //left hit next try right
                     dcif.dhit = 1;
                     dcif.dmemload = left[daddr.idx].data[daddr.blkoff]; 
+                    
 
                 end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
                     n_cnt = cnt + 1;
                     n_hit_left[daddr.idx] = 0; //right hit next try left
                     dcif.dhit = 1;
                     dcif.dmemload = right[daddr.idx].data[daddr.blkoff]; 
+                    
 
                 end else begin
                     miss = 1;
@@ -345,6 +347,7 @@ case(state)
     end
     WB1: begin
         if (!cif.dwait) n_state = WB2;
+        if (cif.ccwait) n_state = TRANS;
     end
     WB2: begin
         if (!cif.dwait) n_state = LD1;
