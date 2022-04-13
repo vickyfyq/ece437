@@ -62,8 +62,8 @@ always_ff @(posedge CLK, negedge nRST) begin
         sclefthit <= n_sclefthit;
         scrighthit <= n_scrighthit;
         if(state == TRANS || state == SHARE1 ) begin
-            left[daddr.idx] <= scleft;
-            right[daddr.idx] <= scright;
+            left[snoopaddr.idx] <= scleft;
+            right[snoopaddr.idx] <= scright;
         end
     end
 end
@@ -101,19 +101,21 @@ always_comb begin
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
            
 
-            if (cif.ccinv && snoop_dirty ) begin
+            if (cif.ccinv && !snoop_dirty ) begin
                 cif.cctrans = 1;
                 //cif.ccwrite = 1;
-                if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
-                if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
+                if(n_sclefthit) scleft = '0;
+                if(n_scrighthit) scright = '0;
             end
             //not dirty
+            /*
             else if (cif.ccinv && !snoop_dirty) begin
                 cif.cctrans = 1;
                 //cif.ccwrite = 0;
                 if(cif.ccinv && !snoop_dirty && n_sclefthit) scleft = '0;
                 if(cif.ccinv && !snoop_dirty && n_scrighthit) scright = '0;
             end
+            */
    
         end
         SHARE1: begin
