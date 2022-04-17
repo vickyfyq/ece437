@@ -114,7 +114,7 @@ always_comb begin
             
             else if (cif.ccinv && !snoop_dirty) begin
 
-                cif.cctrans = 1;
+                cif.cctrans = 0;
                 //cif.ccwrite = 0;
                 if(n_sclefthit) scleft.valid = '0;
                 if(n_scrighthit) scright.valid = '0;

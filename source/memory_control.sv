@@ -60,10 +60,10 @@ module memory_control (
       end
       IFETCH: begin
         if(ccif.ramstate == ACCESS) begin
-          if(|ccif.cctrans)
-            nextstate = ARB;
-          else if(|ccif.dWEN)
+          if(|ccif.dWEN)
             nextstate = WB1;
+          else if(|ccif.cctrans)
+            nextstate = ARB;
           else
             nextstate = IDLE;
         end

@@ -650,3 +650,74 @@ processing file asmFiles/test.coherence2.asm (2 of 2)
 -:040103000000DEAD6D
  :040105000000BEEF49
  :00000001FF
+processing file asmFiles/test.coherence1.asm (1 of 2)
+processing file asmFiles/test.coherence2.asm (2 of 2)
+processing file asmFiles/msi_1.asm (1 of 5)
+processing file asmFiles/msi_2.asm (2 of 5)
+--- memsim.hex	2022-04-17 14:58:11.696961380 -0400
++++ memcpu.hex	2022-04-17 14:58:11.613958296 -0400
+@@ -8,4 +8,5 @@
+ :04008200AD090000C4
+ :040083008D0A0000E2
+ :04008400FFFFFFFF7C
++:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_3.asm (3 of 5)
+--- memsim.hex	2022-04-17 14:58:14.370060725 -0400
++++ memcpu.hex	2022-04-17 14:58:14.278057306 -0400
+@@ -9,4 +9,5 @@
+ :040083008D0A0000E2
+ :04008400AD0A0000C1
+ :04008500FFFFFFFF7B
++:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_4.asm (4 of 5)
+--- memsim.hex	2022-04-17 14:58:17.262168210 -0400
++++ memcpu.hex	2022-04-17 14:58:17.135163490 -0400
+@@ -9,5 +9,4 @@
+ :040082008D090000E4
+ :04008300AD0A0000C2
+ :04008500FFFFFFFF7B
+-:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_5.asm (5 of 5)
+processing file asmFiles/msi_2.asm (1 of 1)
+--- memsim.hex	2022-04-17 14:58:58.926716297 -0400
++++ memcpu.hex	2022-04-17 14:58:58.856713696 -0400
+@@ -8,4 +8,5 @@
+ :04008200AD090000C4
+ :040083008D0A0000E2
+ :04008400FFFFFFFF7C
++:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_3.asm (1 of 1)
+--- memsim.hex	2022-04-17 14:59:59.235957139 -0400
++++ memcpu.hex	2022-04-17 14:59:59.125953051 -0400
+@@ -9,4 +9,5 @@
+ :040083008D0A0000E2
+ :04008400AD0A0000C1
+ :04008500FFFFFFFF7B
++:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_4.asm (1 of 1)
+--- memsim.hex	2022-04-17 15:00:10.626380360 -0400
++++ memcpu.hex	2022-04-17 15:00:10.573378390 -0400
+@@ -9,5 +9,4 @@
+ :040082008D090000E4
+ :04008300AD0A0000C2
+ :04008500FFFFFFFF7B
+-:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_2.asm (1 of 1)
+--- memsim.hex	2022-04-17 15:00:29.184069886 -0400
++++ memcpu.hex	2022-04-17 15:00:29.124067657 -0400
+@@ -8,4 +8,5 @@
+ :04008200AD090000C4
+ :040083008D0A0000E2
+ :04008400FFFFFFFF7C
++:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/test.coherence1.asm (1 of 2)
+processing file asmFiles/test.coherence2.asm (2 of 2)
+processing file asmFiles/test.coherence1.asm (1 of 2)
+processing file asmFiles/test.coherence2.asm (2 of 2)
