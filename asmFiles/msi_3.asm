@@ -19,5 +19,8 @@ ori $t0, $0, 0x400
 ori $t1, $0, 0xee
 sw $t1, 0($t0) # I -> M local write
 lw $t2, 0($t0) # M -> S snoop read
+nop
+nop
+nop
 sw $t2, 0($t0) # S -> M local write
 halt

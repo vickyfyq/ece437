@@ -61,7 +61,7 @@ always_ff @(posedge CLK, negedge nRST) begin
         hit_left <= n_hit_left;
         sclefthit <= n_sclefthit;
         scrighthit <= n_scrighthit;
-        if(state == TRANS || state == SHARE1 ) begin
+        if(state == TRANS || state == SHARE1 || state == SHARE2) begin
             left[snoopaddr.idx] <= scleft;
             right[snoopaddr.idx] <= scright;
         end
@@ -121,7 +121,7 @@ always_comb begin
    
         end
         SHARE1: begin
-            //cif.dWEN = 1;
+            cif.dWEN = 1;
             if(sclefthit) begin
                 scleft.dirty = 0;
                 cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b000};
@@ -135,16 +135,18 @@ always_comb begin
     
         end
         SHARE2: begin
-            //cif.dWEN = 1;
+            cif.dWEN = 1;
             if(sclefthit) begin
                 scleft.dirty = 0;
                 cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b100};
                 cif.dstore = left[snoopaddr.idx].data[1];
+                scleft = '0;
             end 
             else if(scrighthit) begin
                 scright.dirty = 0;
                 cif.daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b100};
                 cif.dstore = right[snoopaddr.idx].data[1];
+                scright = '0;
             end 
         end
         INVALID: begin  
@@ -339,7 +341,7 @@ case(state)
 
     end
     SHARE2: begin
-        if (!cif.dwait) n_state = INVALID;
+        if (!cif.dwait) n_state = IDLE;
 
     end
     INVALID: begin

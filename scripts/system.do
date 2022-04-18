@@ -88,7 +88,7 @@ add wave -noupdate -group cif1 /system_tb/DUT/CPU/cif1/ccsnoopaddr
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/CLK
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/nRST
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/daddr
-add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/left
+add wave -noupdate -group dcache0 -expand /system_tb/DUT/CPU/CM0/DCACHE/left
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/right
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/n_left
 add wave -noupdate -group dcache0 /system_tb/DUT/CPU/CM0/DCACHE/n_right
@@ -236,7 +236,7 @@ add wave -noupdate -group prif1 /system_tb/DUT/CPU/DP1/prif/in_zero
 add wave -noupdate -group prif1 /system_tb/DUT/CPU/DP1/prif/in_WrDest
 add wave -noupdate -group prif1 /system_tb/DUT/CPU/DP1/prif/in_dmemload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2417861 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1320000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 203
@@ -252,4 +252,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1549 ns} {2693 ns}
+WaveRestoreZoom {930661 ps} {2074661 ps}
