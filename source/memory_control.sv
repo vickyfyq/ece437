@@ -27,7 +27,7 @@ module memory_control (
   } state_t;
 
   state_t state, nextstate;
-  logic snooper, next_snooper;
+  logic snooper, next_snooper, access, next_access;
   //logic  [CPUS-1:0] next_ccwait, next_ccinv;
   //word_t [CPUS-1:0] next_ccsnoopaddr;
 
@@ -35,10 +35,12 @@ module memory_control (
     if(nRST == 0) begin
       state <= IDLE;
       snooper <= 0;
+      access <= 0;
     end
     else begin
       state <= nextstate;
       snooper <= next_snooper;
+      access <= next_access;
     end
   end
 
@@ -46,6 +48,7 @@ module memory_control (
   always_comb begin 
     nextstate = state;
     next_snooper = snooper;
+    next_access = access;
     case(state) 
       IDLE: begin
         if(|ccif.dWEN)  nextstate = WB1;
@@ -56,10 +59,14 @@ module memory_control (
         if(ccif.ramstate == ACCESS) nextstate = WB2;
       end
       WB2: begin
-        if(ccif.ramstate == ACCESS) nextstate = IDLE;
+        if(ccif.ramstate == ACCESS) begin
+          next_access = ~access;
+          nextstate = IDLE;
+        end
       end
       IFETCH: begin
         if(ccif.ramstate == ACCESS) begin
+          next_access = ~access;
           if(|ccif.dWEN)
             nextstate = WB1;
           else if(|ccif.cctrans)
@@ -69,12 +76,15 @@ module memory_control (
         end
       end
       ARB: begin 
-        if(|ccif.dREN) begin
+        if(|ccif.dWEN)  nextstate = WB1;
+        else if(|ccif.dREN) begin
           nextstate = SNOOP;
-          if(ccif.dREN[0]) 
+          if(ccif.dREN[0] && (~access || (~ccif.dREN[1] && ~ccif.dWEN[1]))) begin 
             next_snooper = 0;
-          else if(ccif.dREN[1])
+          end
+          else if(ccif.dREN[1] && (access || (~ccif.dREN[0] && ~ccif.dWEN[0]))) begin 
             next_snooper = 1;
+          end
         end
         else
           nextstate = IDLE;
@@ -94,13 +104,19 @@ module memory_control (
         end
       end
       LDRAM2: begin 
-        if(ccif.ramstate == ACCESS) nextstate = IDLE;
+        if(ccif.ramstate == ACCESS) begin
+          nextstate = IDLE;
+          next_access = ~access;
+        end
       end
       RAMCACHE1: begin 
         if(ccif.ramstate == ACCESS) nextstate = RAMCACHE2;
       end
       RAMCACHE2: begin 
-        if(ccif.ramstate == ACCESS) nextstate = IDLE;
+        if(ccif.ramstate == ACCESS) begin
+          nextstate = IDLE;
+          next_access = ~access;
+        end
       end 
     endcase 
   end
@@ -123,13 +139,13 @@ always_comb begin
   ccif.ccinv[1] = ccif.ccwrite[0];
   case (state)
     IFETCH: begin
-      if(ccif.iREN[0] == 1) begin
+      if(ccif.iREN[0] == 1 && (~access || ~ccif.iREN[1])) begin
         ccif.ramaddr = ccif.iaddr[0];
         ccif.ramREN = ccif.iREN[0];
         ccif.iwait[0] = ccif.ramstate != ACCESS;
         ccif.iload[0] = ccif.ramload;
       end
-      else if(ccif.iREN[1] == 1) begin
+      else if(ccif.iREN[1] == 1 && (access || ~ccif.iREN[0])) begin
         ccif.ramaddr = ccif.iaddr[1];
         ccif.ramREN = ccif.iREN[1];
         ccif.iwait[1] = ccif.ramstate != ACCESS;
@@ -137,14 +153,14 @@ always_comb begin
       end
     end
     WB1: begin
-      if(ccif.dWEN[0])begin
+      if(ccif.dWEN[0] && (~access || ~ccif.dWEN[1]))begin
         ccif.ramaddr = ccif.daddr[0];
         ccif.ramWEN = ccif.dWEN[0];
         ccif.ramstore = ccif.dstore[0];
         ccif.dwait[0] = ccif.ramstate != ACCESS;
         ccif.ccwait[1] = 1;
       end
-      else if(ccif.dWEN[1]) begin
+      else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
         ccif.ramaddr = ccif.daddr[1];
         ccif.ramWEN = ccif.dWEN[1];
         ccif.ramstore = ccif.dstore[1];
@@ -153,14 +169,14 @@ always_comb begin
       end
     end
     WB2: begin
-      if(ccif.dWEN[0])begin
+      if(ccif.dWEN[0] && (~access || ~ccif.dWEN[1]))begin
         ccif.ramaddr = ccif.daddr[0];
         ccif.ramWEN = ccif.dWEN[0];
         ccif.ramstore = ccif.dstore[0];
         ccif.dwait[0] = ccif.ramstate != ACCESS;
         ccif.ccwait[1] = 1;
       end
-      else if(ccif.dWEN[1]) begin
+      else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
         ccif.ramaddr = ccif.daddr[1];
         ccif.ramWEN = ccif.dWEN[1];
         ccif.ramstore = ccif.dstore[1];
