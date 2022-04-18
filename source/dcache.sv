@@ -102,14 +102,6 @@ always_comb begin
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
            
 
-            /*if (cif.ccinv && snoop_dirty ) begin
-                cif.cctrans = 1;
-                //cif.ccwrite = 1;
-                if(n_sclefthit) scleft.valid = 0;
-                if(n_scrighthit) scright.valid = 0;
-                if(n_sclefthit) scleft.dirty = '0;
-                if(n_scrighthit) scright.dirty= '0;
-            end*/
             //not dirty  
             cif.cctrans = snoop_dirty;          
             if (cif.ccinv && !snoop_dirty) begin
@@ -285,7 +277,7 @@ always_comb begin
                     end
                 end
             end
-
+/*
             if (miss && ~cif.ccwait && ~dcif.halt) begin
                 if(hit_left[daddr.idx] == 0) begin
                 //left frame or right frame dirty
@@ -294,7 +286,7 @@ always_comb begin
                 else begin
                     cif.cctrans = ~right[daddr.idx].dirty;
                 end
-            end
+            end*/
         end
         default : begin
             n_left = left;
@@ -341,7 +333,7 @@ case(state)
 
     end
     SHARE2: begin
-        if (!cif.dwait) n_state = IDLE;
+        if (!cif.dwait) n_state = INVALID;
 
     end
     INVALID: begin
