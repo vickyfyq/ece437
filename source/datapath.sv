@@ -219,4 +219,6 @@ module datapath (
   //write back register
     assign prif.in_WrDest = WrDest;
 
+    assign dcif.datomic = (prif.mem.imemload[31:26] == LL || prif.mem.imemload[31:26] == SC);
+
 endmodule

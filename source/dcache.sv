@@ -30,6 +30,10 @@ word_t cnt, n_cnt; //hit count
 logic [4:0] frame_cnt, n_frame_cnt, frame_cnt_sub; //select each row frame
 logic [2:0] idx;
 
+///////////////////////////////LL/SC stuff
+word_t link_reg, next_link_reg;
+logic link_valid, next_link_valid;
+
 ///////////////////////////////snoop stuff
 logic snoop_dirty; //snoop dirty 
 //assign snoop_dirty = 0;
@@ -50,7 +54,8 @@ always_ff @(posedge CLK, negedge nRST) begin
         hit_left <= '0;//choose left data/right data
         sclefthit <= '0;
         scrighthit <= '0;
-
+        link_reg <= '0;
+        link_valid <= 0;
     end
     else begin
         left <= n_left;
@@ -61,6 +66,8 @@ always_ff @(posedge CLK, negedge nRST) begin
         hit_left <= n_hit_left;
         sclefthit <= n_sclefthit;
         scrighthit <= n_scrighthit;
+        link_reg <= next_link_reg;
+        link_valid <= next_link_valid;
         if(state == TRANS || state == SHARE1 || state == SHARE2) begin
             left[snoopaddr.idx] <= scleft;
             right[snoopaddr.idx] <= scright;
@@ -94,6 +101,8 @@ always_comb begin
     snoop_dirty = 0;
     cif.cctrans = 0;
     cif.ccwrite = dcif.dmemWEN;
+    next_link_reg = link_reg;
+    next_link_valid = link_valid;
     case(state)
         TRANS: begin
             n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
@@ -229,12 +238,16 @@ always_comb begin
         end
         IDLE: begin
             if(dcif.dmemREN) begin //read data left frame or right frame or miss
+                if(dcif.datomic) begin
+                    next_link_reg = dcif.dmemaddr;
+                    next_link_valid = 1;
+                end
+
                 if(daddr.tag == left[daddr.idx].tag && left[daddr.idx].valid) begin//if left matches, hit
                     n_cnt = cnt + 1;
                     n_hit_left[daddr.idx] = 1; //left hit next try right
                     dcif.dhit = 1;
                     dcif.dmemload = left[daddr.idx].data[daddr.blkoff]; 
-                    
 
                 end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
                     n_cnt = cnt + 1;
@@ -251,29 +264,80 @@ always_comb begin
             end
 
             else if(dcif.dmemWEN) begin //read data left frame or right frame or miss
-                if(daddr.tag == left[daddr.idx].tag && left[daddr.idx].valid) begin//if left matches, hit
-                    dcif.dhit = 1;
-                    n_cnt = cnt + 1;
-                    n_left[daddr.idx].dirty = 1;
-                    n_hit_left[daddr.idx] = 1; //left hit next try right
-                    n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                if(dcif.datomic) begin
+                    dcif.dmemload = (daddr == link_reg) && link_valid;
 
-                end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
-                    dcif.dhit = 1;
-                    n_cnt = cnt + 1;
-                    n_right[daddr.idx].dirty = 1;
-                    n_hit_left[daddr.idx] = 0; //right hit next try left
-                    n_right[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                    if(dcif.dmemload) begin
+                        if(daddr.tag == left[daddr.idx].tag) begin
+                            n_left[daddr.idx].dirty = 1;
+                            if(~left[daddr.idx].dirty && left[daddr.idx].valid) begin
+                                miss = 1;
+                                n_hit_left[daddr.idx] = 0; 
+                            end else begin
+                                dcif.dhit = 1;
+                                next_link_reg = 0;
+                                next_link_valid = 0;
+                                n_hit_left[daddr.idx] = 1; 
+                                n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                            end
+                        end
+                        else if(daddr.tag == right[daddr.idx].tag) begin
+                            n_right[daddr.idx].dirty = 1;
+                            if(~right[daddr.idx].dirty && right[daddr.idx].valid) begin
+                                miss = 1;
+                                n_hit_left[daddr.idx] = 1; 
+                            end else begin
+                                dcif.dhit = 1;
+                                next_link_reg = 0;
+                                next_link_valid = 0;
+                                n_hit_left[daddr.idx] = 0; 
+                                n_right[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                            end
+                        end
+                        else begin 
+                            miss = 1;
+                            if(hit_left[daddr.idx] == 0) begin
+                                n_left[daddr.idx].dirty = 0;
+                                n_left[daddr.idx].valid = 1;
+                            end else begin
+                                n_right[daddr.idx].dirty = 0;
+                                n_right[daddr.idx].dirty = 1;
+                            end
+                        end
+                    end
+                    else 
+                        dcif.dhit = 1;
+                end
 
-                end else begin
-                    miss = 1;
-                    n_cnt = cnt - 1; //decrement hit count when miss
-                    if(hit_left[daddr.idx] == 0) begin
-                        n_left[daddr.idx].dirty = 0;
-                        n_left[daddr.idx].valid = 1;
-                    end else begin
-                        n_right[daddr.idx].dirty = 0;
+                else begin
+                    if(daddr == link_reg) begin
+                        next_link_reg = 0;
+                        next_link_valid = 0;
+                    end
+                    if(daddr.tag == left[daddr.idx].tag && left[daddr.idx].valid) begin//if left matches, hit
+                        dcif.dhit = 1;
+                        n_cnt = cnt + 1;
+                        n_left[daddr.idx].dirty = 1;
+                        n_hit_left[daddr.idx] = 1; //left hit next try right
+                        n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+
+                    end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
+                        dcif.dhit = 1;
+                        n_cnt = cnt + 1;
                         n_right[daddr.idx].dirty = 1;
+                        n_hit_left[daddr.idx] = 0; //right hit next try left
+                        n_right[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+
+                    end else begin
+                        miss = 1;
+                        n_cnt = cnt - 1; //decrement hit count when miss
+                        if(hit_left[daddr.idx] == 0) begin
+                            n_left[daddr.idx].dirty = 0;
+                            n_left[daddr.idx].valid = 1;
+                        end else begin
+                            n_right[daddr.idx].dirty = 0;
+                            n_right[daddr.idx].dirty = 1;
+                        end
                     end
                 end
             end
