@@ -175,7 +175,7 @@ module datapath (
   //datapath output
   assign dcif.halt = halt;
   assign dcif.imemREN = ~dcif.dmemREN && ~dcif.dmemWEN;
-  assign dcif.dmemREN = prif.mem.MemtoReg; 
+  assign dcif.dmemREN = prif.mem.MemtoReg && (prif.mem.imemload[31:26] != SC); 
   assign dcif.dmemWEN = prif.mem.MemWr; 
   assign dcif.dmemstore = prif.mem.rdat2;
   assign dcif.dmemaddr = prif.mem.ALUout;

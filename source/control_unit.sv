@@ -228,7 +228,9 @@ else begin
     SC    :begin
         cuif.ALUOp = ALU_ADD;
         cuif.signext = 1;
+        cuif.MemtoReg = 1;
         cuif.ALUSrc = 1;
+        cuif.RegWr = 1;
         cuif.MemWr = 1;
     end
 

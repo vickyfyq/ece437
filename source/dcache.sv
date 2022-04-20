@@ -279,6 +279,8 @@ always_comb begin
                                 next_link_valid = 0;
                                 n_hit_left[daddr.idx] = 1; 
                                 n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                                if(link_valid)
+                                    next_link_reg = link_reg + 1;
                             end
                         end
                         else if(daddr.tag == right[daddr.idx].tag) begin
@@ -292,6 +294,8 @@ always_comb begin
                                 next_link_valid = 0;
                                 n_hit_left[daddr.idx] = 0; 
                                 n_right[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                                if(link_valid)
+                                    next_link_reg = link_reg + 1;
                             end
                         end
                         else begin 
@@ -320,6 +324,8 @@ always_comb begin
                         n_left[daddr.idx].dirty = 1;
                         n_hit_left[daddr.idx] = 1; //left hit next try right
                         n_left[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                        if(link_valid)
+                            next_link_reg = link_reg + 1;
 
                     end else if (daddr.tag == right[daddr.idx].tag && right[daddr.idx].valid) begin //if right matches, hit
                         dcif.dhit = 1;
@@ -327,6 +333,8 @@ always_comb begin
                         n_right[daddr.idx].dirty = 1;
                         n_hit_left[daddr.idx] = 0; //right hit next try left
                         n_right[daddr.idx].data[daddr.blkoff] = dcif.dmemstore;
+                        if(link_valid)
+                            next_link_reg = link_reg + 1;
 
                     end else begin
                         miss = 1;
