@@ -94,7 +94,7 @@ always_comb begin
     frame_cnt_sub = 0;
     snoop_dirty = 0;
     //cif.ccwrite = 0;
-    scright = right;
+    scright = right[snoopaddr.idx];
     scleft = left[snoopaddr.idx];
     n_sclefthit = sclefthit;
     n_scrighthit = scrighthit;
@@ -105,8 +105,8 @@ always_comb begin
     next_link_valid = link_valid;
     case(state)
         TRANS: begin
-            n_sclefthit = snoopaddr.tag == left[snoopaddr.idx].tag;
-            n_scrighthit = snoopaddr.tag == right[snoopaddr.idx].tag;
+            n_sclefthit = (snoopaddr.tag == left[snoopaddr.idx].tag) && left[snoopaddr.idx].valid;
+            n_scrighthit = (snoopaddr.tag == right[snoopaddr.idx].tag) && right[snoopaddr.idx].valid;
             snoop_dirty = n_sclefthit ? left[snoopaddr.idx].dirty : 
                         (n_scrighthit ? right[snoopaddr.idx].dirty:1'b0);
            
@@ -141,13 +141,15 @@ always_comb begin
                 scleft.dirty = 0;
                 cif.daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b100};
                 cif.dstore = left[snoopaddr.idx].data[1];
-                scleft = '0;
+                if(!cif.dwait)
+                    scleft = '0;
             end 
             else if(scrighthit) begin
                 scright.dirty = 0;
                 cif.daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b100};
                 cif.dstore = right[snoopaddr.idx].data[1];
-                scright = '0;
+                if(!cif.dwait)
+                    scright = '0;
             end 
         end
         INVALID: begin  
@@ -205,13 +207,13 @@ always_comb begin
             cif.dREN = 1;
             //cif.ccwrite = 0;
             cif.daddr = {daddr.tag,daddr.idx,3'b100};
-            if (hit_left[daddr.idx]) begin
+            if (hit_left[daddr.idx] && ~cif.dwait) begin
                 n_right[daddr.idx].data[1] = cif.dload;
                 n_right[daddr.idx].tag = daddr.tag;
                 n_right[daddr.idx].dirty = 0;
                 n_right[daddr.idx].valid = 1;
             end   
-            else begin
+            else if (~cif.dwait) begin
                 n_left[daddr.idx].data[1] = cif.dload;
                 n_left[daddr.idx].tag = daddr.tag;
                 n_left[daddr.idx].dirty = 0;
@@ -223,8 +225,8 @@ always_comb begin
             cif.dREN = 1;
             cif.cctrans = ~cif.ccwait;
             cif.daddr = {daddr.tag,daddr.idx,3'h0};
-            if (hit_left[daddr.idx])    n_right[daddr.idx].data[0] = cif.dload;
-            else    n_left[daddr.idx].data[0] = cif.dload;
+            if (hit_left[daddr.idx] && ~cif.dwait)    n_right[daddr.idx].data[0] = cif.dload;
+            else if (~cif.dwait)    n_left[daddr.idx].data[0] = cif.dload;
         end
         WB2 : begin
             cif.dWEN = 1;
