@@ -147,30 +147,32 @@ always_comb begin
         end
         SHARE1: begin
             dWEN = 1;
+            cctrans = 1;
             if(sclefthit) begin
                 scleft.dirty = 0;
-                daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b000};
+                daddr = {snoopaddr.tag,snoopaddr.idx,3'b000};
                 dstore = left[snoopaddr.idx].data[0];
             end 
             else if(scrighthit) begin
                 scright.dirty = 0;
-                daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b000};
+                daddr = {snoopaddr.tag,snoopaddr.idx,3'b000};
                 dstore = right[snoopaddr.idx].data[0];
             end 
     
         end
         SHARE2: begin
-            dWEN = 1;
-            if(sclefthit) begin
+            dWEN = cif.dwait && cif.ccwait;
+            cctrans = 1;
+            if(sclefthit && cif.ccwait) begin
                 scleft.dirty = 0;
-                daddr = {left[snoopaddr.idx],snoopaddr.tag,3'b100};
+                daddr = {snoopaddr.tag,snoopaddr.idx,3'b100};
                 dstore = left[snoopaddr.idx].data[1];
                 if(!cif.dwait)
                     scleft = '0;
             end 
-            else if(scrighthit) begin
+            else if(scrighthit && cif.ccwait) begin
                 scright.dirty = 0;
-                daddr = {right[snoopaddr.idx],snoopaddr.tag,3'b100};
+                daddr = {snoopaddr.tag,snoopaddr.idx,3'b100};
                 dstore = right[snoopaddr.idx].data[1];
                 if(!cif.dwait)
                     scright = '0;
@@ -212,7 +214,7 @@ always_comb begin
         end    
         FLUSH2 : begin
             cctrans = 1;
-            dWEN = 1;
+            dWEN = cif.dwait;
             ccwrite = 1;
             if(frame_cnt - 1 < 8) begin
                 frame_cnt_sub = frame_cnt - 1;
@@ -236,12 +238,14 @@ always_comb begin
                 n_right[dmemaddr.idx].tag = dmemaddr.tag;
                 n_right[dmemaddr.idx].dirty = 0;
                 n_right[dmemaddr.idx].valid = 1;
+                dREN = 0;
             end   
             else if (~cif.dwait) begin
                 n_left[dmemaddr.idx].data[1] = cif.dload;
                 n_left[dmemaddr.idx].tag = dmemaddr.tag;
                 n_left[dmemaddr.idx].dirty = 0;
                 n_left[dmemaddr.idx].valid = 1;
+                dREN = 0;
             end    
         end
         LD1: begin
@@ -253,7 +257,7 @@ always_comb begin
             else if (~cif.dwait)    n_left[dmemaddr.idx].data[0] = cif.dload;
         end
         WB2 : begin
-            dWEN = 1;
+            dWEN = cif.dwait;
             daddr = hit_left[dmemaddr.idx] ? {right[dmemaddr.idx].tag,dmemaddr.idx,3'b100} :{left[dmemaddr.idx].tag,dmemaddr.idx,3'b100};
             dstore = hit_left[dmemaddr.idx] ? right[dmemaddr.idx].data[1] : left[dmemaddr.idx].data[1];
         end
@@ -331,7 +335,7 @@ always_comb begin
                                 n_left[dmemaddr.idx].valid = 1;
                             end else begin
                                 n_right[dmemaddr.idx].dirty = 0;
-                                n_right[dmemaddr.idx].dirty = 1;
+                                n_right[dmemaddr.idx].valid = 1;
                             end
                         end
                     end
@@ -428,10 +432,11 @@ case(state)
     end
     SHARE1: begin
         if (!cif.dwait) n_state = SHARE2;
+        if (!cif.cctrans) n_state = IDLE;
 
     end
     SHARE2: begin
-        if (!cif.dwait) n_state = INVALID;
+        if (!cif.dwait) n_state = IDLE;
 
     end
     INVALID: begin

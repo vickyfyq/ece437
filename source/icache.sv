@@ -29,7 +29,7 @@ logic [3:0] index;
 word_t imemload;
 logic ihit;
 integer i;
-typedef enum logic { HIT, MISS } state_t;
+typedef enum logic [1:0] { HIT, MISS, WAIT1, WAIT2 } state_t;
 state_t state, nextstate;
 
 //The maps
@@ -42,7 +42,7 @@ always_ff @(posedge CLK or negedge nRST) begin
 		end
         state <= HIT;
 	end else begin
-		if(ihit) begin
+		if(ihit && state != WAIT1 && state != WAIT2) begin
 			 hashTable[index].tag <= tag;
 			 hashTable[index].data <= imemload;
 			 hashTable[index].valid <= 1;
@@ -60,13 +60,18 @@ assign imemload = cif.iload;
 always_comb begin
     nextstate = state;
     casez (state) 
-        HIT:
+        HIT: begin
             if(!dcif.halt && dcif.imemREN && !dcif.dmemREN && !dcif.dmemWEN)
                 if((tag != hashTable[index].tag) || !hashTable[index].valid) 
                     nextstate = MISS;
-        MISS:
+
+        end
+        MISS: begin
             if(ihit)
-                nextstate = HIT;
+                nextstate = WAIT1;
+        end
+        WAIT1: nextstate = WAIT2;
+        WAIT2: nextstate = HIT;
 
     endcase
 end
@@ -84,6 +89,10 @@ always_comb begin
                     dcif.ihit = 1;
                     dcif.imemload = hashTable[index].data;
                 end
+                else begin
+                    dcif.ihit = 0;
+                    dcif.imemload = 0;
+                end
             end
         end
         MISS: begin
@@ -92,6 +101,18 @@ always_comb begin
             dcif.ihit = ihit;
             dcif.imemload = imemload;
 		end
+        WAIT1: begin
+            iREN = '0;
+            iaddr = '0;
+            dcif.ihit = 0;
+            dcif.imemload = '0;
+        end
+        WAIT2: begin
+            iREN = '0;
+            iaddr = '0;
+            dcif.ihit = 0;
+            dcif.imemload = '0;
+        end
     endcase
 end
 
