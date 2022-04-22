@@ -432,11 +432,12 @@ case(state)
     end
     SHARE1: begin
         if (!cif.dwait) n_state = SHARE2;
-        if (!cif.cctrans) n_state = IDLE;
+        if (!cif.ccwait) n_state = IDLE;
 
     end
     SHARE2: begin
         if (!cif.dwait) n_state = IDLE;
+        if (!cif.ccwait) n_state = IDLE;
 
     end
     INVALID: begin
