@@ -29,13 +29,5 @@ ori $t0, $0, 0x400
 ori $t1, $0, 0xb00b
 sw $t1, 0($t0) # I -> M local write
 nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+
 halt

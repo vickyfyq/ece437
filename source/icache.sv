@@ -8,6 +8,19 @@ module icache (
 	caches_if.icache cif
 );
 
+logic iREN;
+word_t iaddr;
+always_ff @(posedge CLK, negedge nRST) begin
+    if(!nRST) begin
+        cif.iREN <= 0;
+        cif.iaddr <= 0;
+    end
+    else begin
+        cif.iREN <= iREN;
+        cif.iaddr <= iaddr;
+    end
+end
+
 icache_frame hashTable [15:0]; //to match the addrs
 
 logic [25:0] tag;
@@ -62,8 +75,8 @@ always_comb begin
 
     casez (state)
         HIT: begin
-            cif.iREN = '0;
-            cif.iaddr = '0;
+            iREN = '0;
+            iaddr = '0;
             dcif.ihit = 0;
             dcif.imemload = '0;
             if(!dcif.halt && dcif.imemREN && !dcif.dmemREN && !dcif.dmemWEN) begin
@@ -74,8 +87,8 @@ always_comb begin
             end
         end
         MISS: begin
-            cif.iREN = dcif.imemREN;
-            cif.iaddr = dcif.imemaddr;
+            iREN = dcif.imemREN;
+            iaddr = dcif.imemaddr;
             dcif.ihit = ihit;
             dcif.imemload = imemload;
 		end
