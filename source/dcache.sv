@@ -142,6 +142,10 @@ always_comb begin
                 if(n_scrighthit) scright = '0;
                 
             end
+            if(snoopaddr == link_reg && cif.ccinv) begin
+                next_link_reg = 0;
+                next_link_valid = 0;
+            end
             
    
         end
@@ -267,7 +271,15 @@ always_comb begin
             dstore = hit_left[dmemaddr.idx] ? right[dmemaddr.idx].data[0] : left[dmemaddr.idx].data[0];
         end
         IDLE: begin
-            if(dcif.dmemREN) begin //read data left frame or right frame or miss
+            daddr = dmemaddr;
+            if(snoopaddr.tag == left[snoopaddr.idx].tag && cif.ccinv) begin
+                n_left[snoopaddr.idx] = '0;
+            end
+            if(snoopaddr.tag == right[snoopaddr.idx].tag && cif.ccinv) begin
+                n_right[snoopaddr.idx] = '0;
+            end
+
+            if(dcif.dmemREN && !cif.ccwait) begin //read data left frame or right frame or miss
                 if(dcif.datomic) begin
                     next_link_reg = dcif.dmemaddr;
                     next_link_valid = 1;
@@ -293,7 +305,7 @@ always_comb begin
 
             end
 
-            else if(dcif.dmemWEN) begin //read data left frame or right frame or miss
+            else if(dcif.dmemWEN && !cif.ccwait) begin //read data left frame or right frame or miss
                 if(dcif.datomic) begin
                     dcif.dmemload = (dmemaddr == link_reg) && link_valid;
 
@@ -301,9 +313,6 @@ always_comb begin
                         if(dmemaddr.tag == left[dmemaddr.idx].tag) begin
                             n_left[dmemaddr.idx].dirty = 1;
                             if(~left[dmemaddr.idx].dirty && left[dmemaddr.idx].valid) begin
-                                miss = 1;
-                                n_hit_left[dmemaddr.idx] = 0; 
-                            end else begin
                                 dcif.dhit = 1;
                                 next_link_reg = 0;
                                 next_link_valid = 0;
@@ -311,14 +320,15 @@ always_comb begin
                                 n_left[dmemaddr.idx].data[dmemaddr.blkoff] = dcif.dmemstore;
                                 if(link_valid)
                                     next_link_reg = link_reg + 1;
+        
+                            end else begin
+                                miss = 1;
+                                n_hit_left[dmemaddr.idx] = 0; 
                             end
                         end
                         else if(dmemaddr.tag == right[dmemaddr.idx].tag) begin
                             n_right[dmemaddr.idx].dirty = 1;
                             if(~right[dmemaddr.idx].dirty && right[dmemaddr.idx].valid) begin
-                                miss = 1;
-                                n_hit_left[dmemaddr.idx] = 1; 
-                            end else begin
                                 dcif.dhit = 1;
                                 next_link_reg = 0;
                                 next_link_valid = 0;
@@ -326,6 +336,10 @@ always_comb begin
                                 n_right[dmemaddr.idx].data[dmemaddr.blkoff] = dcif.dmemstore;
                                 if(link_valid)
                                     next_link_reg = link_reg + 1;
+
+                            end else begin
+                                miss = 1;
+                                n_hit_left[dmemaddr.idx] = 1; 
                             end
                         end
                         else begin 
@@ -464,8 +478,8 @@ case(state)
         n_frame_cnt = frame_cnt + 1;
         if(frame_cnt == 16) //if went through all the frames, hit cnt +1
             n_state = HALT;
-        //if(cif.ccwait)
-        //    n_state = TRANS;
+        if(cif.ccwait)
+            n_state = TRANS;
     end
     CNT : begin
         if (!cif.dwait) n_state = HALT;

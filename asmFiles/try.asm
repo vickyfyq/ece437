@@ -39,6 +39,7 @@ check_stack:
 
 reset_stack_pointer:
 	ori		$s3, $zero, 0
+	#sw		$0, offset($zero)		# store the current stack
 	jr		$ra 		
 done:
 	ori		$t5, $zero, 256
@@ -88,7 +89,7 @@ findmax:
 calc:
 	sw 		$s2, res_min($zero)		# min value
 	sw		$s1, res_max($zero)		# max value
-	srl 	$s0, $s0, 8           # divide by 256
+	#srl 	$s0, $s0, 8           # divide by 256
 	sw 		$s0, res_avg($zero)		# store the value
 
 	halt
@@ -224,7 +225,7 @@ l2:
 #--------------------------------------------------
 l4:
 	cfw 	0x0000
-
+org 0x500
 ready:
 	cfw 	0x0000
 offset:       

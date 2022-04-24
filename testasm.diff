@@ -33,3 +33,67 @@ processing file asmFiles/dual.llsc.asm (1 of 4)
 processing file asmFiles/dual.mergesort.asm (2 of 4)
 processing file asmFiles/test.coherence1.asm (3 of 4)
 processing file asmFiles/test.coherence2.asm (4 of 4)
+processing file asmFiles/test.coherence1.asm (1 of 2)
+processing file asmFiles/test.coherence2.asm (2 of 2)
+processing file asmFiles/dual.llsc.asm (1 of 2)
+processing file asmFiles/dual.mergesort.asm (2 of 2)
+processing file asmFiles/dual.llsc.asm (1 of 1)
+processing file asmFiles/msi_1.asm (1 of 8)
+--- memsim.hex	2022-04-24 15:42:45.992599148 -0400
++++ memcpu.hex	2022-04-24 15:42:45.905595910 -0400
+@@ -8,5 +8,4 @@
+ :040082008D090000E4
+ :04008300AD0A0000C2
+ :04008400FFFFFFFF7C
+-:04010000000000EE0D
+ :00000001FF
+processing file asmFiles/msi_2.asm (2 of 8)
+processing file asmFiles/msi_1.asm (1 of 8)
+processing file asmFiles/msi_2.asm (2 of 8)
+processing file asmFiles/msi_3.asm (3 of 8)
+processing file asmFiles/msi_4.asm (4 of 8)
+processing file asmFiles/msi_5.asm (5 of 8)
+processing file asmFiles/msi_6.asm (6 of 8)
+processing file asmFiles/msi_7.asm (7 of 8)
+processing file asmFiles/msi_8.asm (8 of 8)
+processing file asmFiles/dual.llsc.asm (1 of 2)
+processing file asmFiles/dual.mergesort.asm (2 of 2)
+processing file asmFiles/example.asm (1 of 1)
+processing file asmFiles/palgorithm.asm (1 of 1)
+processing file asmFiles/example.asm (1 of 1)
+processing file asmFiles/try.asm (1 of 1)
+processing file asmFiles/msi_1.asm (1 of 8)
+processing file asmFiles/msi_2.asm (2 of 8)
+processing file asmFiles/msi_3.asm (3 of 8)
+processing file asmFiles/msi_4.asm (4 of 8)
+processing file asmFiles/msi_5.asm (5 of 8)
+processing file asmFiles/dual.llsc.asm (1 of 2)
+processing file asmFiles/dual.mergesort.asm (2 of 2)
+processing file asmFiles/msi_1.asm (1 of 8)
+processing file asmFiles/msi_2.asm (2 of 8)
+processing file asmFiles/msi_3.asm (3 of 8)
+processing file asmFiles/msi_4.asm (4 of 8)
+processing file asmFiles/msi_5.asm (5 of 8)
+processing file asmFiles/dual.llsc.asm (1 of 2)
+processing file asmFiles/dual.mergesort.asm (2 of 2)
+processing file asmFiles/try.asm (1 of 1)
+--- memsim.hex	2022-04-24 17:03:42.177309185 -0400
++++ memcpu.hex	2022-04-24 17:03:42.009302933 -0400
+@@ -175,8 +175,8 @@
+ :04010F009745E58F9C
+ :04018000000000106B
+ :040181000000FF7B00
+-:040182000082FBD329
+-:043FFD000000CEA052
++:040182000083431D96
++:043FFD000000C9AD4A
+ :043FFE000000FF7B45
+ :043FFF000000025C60
+ :00000001FF
+processing file asmFiles/msi_1.asm (1 of 8)
+processing file asmFiles/msi_2.asm (2 of 8)
+processing file asmFiles/msi_3.asm (3 of 8)
+processing file asmFiles/msi_4.asm (4 of 8)
+processing file asmFiles/msi_5.asm (5 of 8)
+processing file asmFiles/dual.llsc.asm (1 of 2)
+processing file asmFiles/dual.mergesort.asm (2 of 2)

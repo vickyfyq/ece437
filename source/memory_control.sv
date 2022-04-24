@@ -222,7 +222,7 @@ always_comb begin
         ccif.ramstore = ccif.dstore[0];
         dwait[0] = ccif.ramstate != ACCESS;
         ccwait[1] = 1;
-        ccsnoopaddr[1] = 0;
+        //ccsnoopaddr[1] = 0;
       end
       else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
         ccif.ramaddr = ccif.daddr[1];
@@ -230,26 +230,26 @@ always_comb begin
         ccif.ramstore = ccif.dstore[1];
         dwait[1] = ccif.ramstate != ACCESS;
         ccwait[0] = 1;
-        ccsnoopaddr[0] = 0;
+        //ccsnoopaddr[0] = 0;
       end
     end
     WB_WAIT1 : begin
       if(ccif.dWEN[0] && (~access || ~ccif.dWEN[1])) begin
-        ccsnoopaddr[1] = 0;
+        //ccsnoopaddr[1] = 0;
         ccwait[1] = 1;
       end
       else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
-        ccsnoopaddr[0] = 0;
+        //ccsnoopaddr[0] = 0;
         ccwait[0] = 1;
       end
     end
     WB_WAIT2 : begin
       if(ccif.dWEN[0] && (~access || ~ccif.dWEN[1])) begin
-        ccsnoopaddr[1] = 0;
+        //ccsnoopaddr[1] = 0;
         ccwait[1] = 1;
       end
       else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
-        ccsnoopaddr[0] = 0;
+        //ccsnoopaddr[0] = 0;
         ccwait[0] = 1;
       end
     end
@@ -260,7 +260,7 @@ always_comb begin
         ccif.ramstore = ccif.dstore[0];
         dwait[0] = ccif.ramstate != ACCESS;
         ccwait[1] = 1;
-        ccsnoopaddr[1] = 0;
+        //ccsnoopaddr[1] = 0;
       end
       else if(ccif.dWEN[1] && (access || ~ccif.dWEN[0])) begin
         ccif.ramaddr = ccif.daddr[1];
@@ -268,7 +268,7 @@ always_comb begin
         ccif.ramstore = ccif.dstore[1];
         dwait[1] = ccif.ramstate != ACCESS;
         ccwait[0] = 1;
-        ccsnoopaddr[0] = 0;
+        //ccsnoopaddr[0] = 0;
       end
     end
 
