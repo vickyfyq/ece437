@@ -272,11 +272,16 @@ always_comb begin
         end
         IDLE: begin
             daddr = dmemaddr;
-            if(snoopaddr.tag == left[snoopaddr.idx].tag && cif.ccinv) begin
+            if(snoopaddr.tag == left[snoopaddr.idx].tag && cif.ccinv && !left[snoopaddr.idx].dirty) begin
                 n_left[snoopaddr.idx] = '0;
             end
-            if(snoopaddr.tag == right[snoopaddr.idx].tag && cif.ccinv) begin
+            if(snoopaddr.tag == right[snoopaddr.idx].tag && cif.ccinv && !right[snoopaddr.idx].dirty) begin
                 n_right[snoopaddr.idx] = '0;
+            end
+
+            if(snoopaddr == link_reg && cif.ccinv) begin
+                next_link_reg = 0;
+                next_link_valid = 0;
             end
 
             if(dcif.dmemREN && !cif.ccwait) begin //read data left frame or right frame or miss
@@ -358,10 +363,7 @@ always_comb begin
                 end
 
                 else begin
-                    if(dmemaddr == link_reg) begin
-                        next_link_reg = 0;
-                        next_link_valid = 0;
-                    end
+                    
                     if(dmemaddr.tag == left[dmemaddr.idx].tag && left[dmemaddr.idx].valid) begin//if left matches, hit
                         dcif.dhit = 1;
                         n_cnt = cnt + 1;
@@ -464,10 +466,10 @@ case(state)
         else if (miss) begin
             if(hit_left[dmemaddr.idx] == 0) begin
             //left frame or right frame dirty
-                n_state = left[dmemaddr.idx].dirty ? WB1 : LD1;
+                n_state = (left[dmemaddr.idx].dirty && left[dmemaddr.idx].valid) ? WB1 : LD1;
             end
             else begin
-                n_state = right[dmemaddr.idx].dirty ? WB1 : LD1;
+                n_state = (right[dmemaddr.idx].dirty && right[dmemaddr.idx].valid) ? WB1 : LD1;
             end
         end
     end
